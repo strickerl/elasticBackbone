@@ -11,7 +11,7 @@ import numpy as np
 
 
 
-def First_burning_loop_from_P1_to_P2(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_to_index,Lx_box,Ly_box,Lz_box):
+def forward_burning(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_to_index,Lx_box,Ly_box,Lz_box):
     '''
     FIRST BURNING LOOP, FROM P1 TO P2:
     It finds the length of elastic backbone, i.e. min number of connected particles 
@@ -54,7 +54,7 @@ def First_burning_loop_from_P1_to_P2(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_t
     #Initialize
     burningTimes     = [0]*Npart
     burnt            = [0]*Npart
-    kk_BurningSource = [0]*Npart
+    indexesBurningSource = [0]*Npart
     burningTimeIndex = 1;     #Counter of burning step
     
     #Starting point of the burning loop (P1)
@@ -128,7 +128,7 @@ def First_burning_loop_from_P1_to_P2(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_t
                         burnt[kkN]    = 1        #Flag signaling that the point has now burnt
                         burntNow[kkN] = 1        #Flag that says that this point was burnt at the present time step   
                         kk_newPts.append(kkN)        #I add point N to the list of the new 'present points'
-                        kk_BurningSource[kkN] = kk   #Index kk of point who burnt IDN (i.e.index kkN) 
+                        indexesBurningSource[kkN] = kk   #Index kk of point who burnt IDN (i.e.index kkN) 
                       
                             
            
@@ -153,7 +153,7 @@ def First_burning_loop_from_P1_to_P2(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_t
     
     for ii  in range(0,MinN_P1P2):
         
-        kk_Burner = kk_BurningSource[kk]  #Index of point that burnt point kk
+        kk_Burner = indexesBurningSource[kk]  #Index of point that burnt point kk
         
         xP  = x[kk]
         yP  = y[kk]
@@ -174,7 +174,7 @@ def First_burning_loop_from_P1_to_P2(x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_t
 
 #----------------------------------------------------------------------------------
 
-def Second_burning_loop_from_P2_to_P1\
+def backward_burning\
     (x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_to_index,Lx_box,Ly_box,Lz_box,points):
     '''
     SECOND BURNING LOOP, from P2 to P1:

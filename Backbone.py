@@ -42,7 +42,7 @@ class BackboneTimeEvolution:
     
     def __init__(self,timeCount):
     
-        self.all       = np.zeros(timeCount, dtype=object)
+        self.allTimes   = np.zeros(timeCount, dtype=object)
         self.timeCount = timeCount
 
 
@@ -54,12 +54,12 @@ class BackboneTimeEvolution:
     def printOnScreen(self):
 
         timeCount  =  self.timeCount
-        time                    = [self.all[index].time for index in range(0,timeCount)]        
-        nParticleMinBackbone    = [self.all[index].minParticleCount for index in range(0,timeCount)] 
-        nParticleTotBackbone    = [self.all[index].totalParticleCount for index in range(0,timeCount)] 
-        nParticleLargestCluster = [self.all[index].largestClusterParticleCount for index in range(0,timeCount)] 
-        connectedLengthMin      = [self.all[index].minPathLength for index in range(0,timeCount)]
-        linearDistance          = [self.all[index].linearDistanceExtremes for index in range(0,timeCount)]
+        time                    = [self.allTimes[timeIndex].time for timeIndex in range(0,timeCount)]        
+        nParticleMinBackbone    = [self.allTimes[timeIndex].minParticleCount for timeIndex in range(0,timeCount)] 
+        nParticleTotBackbone    = [self.allTimes[timeIndex].totalParticleCount for timeIndex in range(0,timeCount)] 
+        nParticleLargestCluster = [self.allTimes[timeIndex].largestClusterParticleCount for timeIndex in range(0,timeCount)] 
+        connectedLengthMin      = [self.allTimes[timeIndex].minPathLength for timeIndex in range(0,timeCount)]
+        linearDistance          = [self.allTimes[timeIndex].linearDistanceExtremes for timeIndex in range(0,timeCount)]
 
         ax = plt.figure(1)
         line1, = plt.plot(time, nParticleMinBackbone,'r')

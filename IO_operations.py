@@ -9,11 +9,15 @@ Created on Sat Aug 20 16:35:29 2022
 
 import os
 import re
+from importlib import reload
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from dataclasses import make_dataclass
 
+import SimulationBox
+reload(SimulationBox)
+from SimulationBox import SimulationBox
 
 
 def natural_sort(l): 
@@ -71,7 +75,7 @@ def extract_input_file_list():
 
 
 
-def Read_file(rMin,rMax,Name_files):
+def read_file(rMin,rMax,Name_files):
 
     '''Read files
     
@@ -84,8 +88,8 @@ def Read_file(rMin,rMax,Name_files):
     int
         Npart
         
-    float    
-        Lx_box,Ly_box,Lz_box,
+    Class(SimulationBox)    
+        Box
                  
     list (int)    
         IDpart   = identifiers of particles
@@ -111,9 +115,12 @@ def Read_file(rMin,rMax,Name_files):
     list_of_numbers = list(map_object)
     Npart  = int(list_of_numbers[0])          #Number of particles
     Nclust = int(list_of_numbers[1])          #Number of clusters
-    Lx_box = list_of_numbers[2]               #Length x of the box
-    Ly_box = list_of_numbers[3]               #Length y of the box
-    Lz_box = list_of_numbers[4]               #Length z of the box 
+    lengthBoxX = list_of_numbers[2]               #Length x of the box
+    lengthBoxY = list_of_numbers[3]               #Length y of the box
+    lengthBoxZ = list_of_numbers[4]               #Length z of the box 
+       
+    Box = SimulationBox(lengthBoxX,lengthBoxY,lengthBoxZ)   
+       
        
        
     #Read file into a data frame
@@ -166,8 +173,7 @@ def Read_file(rMin,rMax,Name_files):
     
     
     
-    return Lx_box,Ly_box,Lz_box,\
-           particleNumber,particleID,chemicalType,x,y,z,radius,volume,\
+    return Box,particleNumber,particleID,chemicalType,x,y,z,radius,volume,\
            NumberOfNeighbours,neighbourIDs,particleIDToIndex
 
 
@@ -186,16 +192,15 @@ def Create_conversion_table_from_particle_ID_to_index(particleIDs,df_particlesLa
     '''   
     
     
-    #Max ID of particles
     particleIDMax  = df_particlesLargestCluster["IDparticle"].max() 
     
     #Number of particles
-    particleNumber = len(df_particlesLargestCluster)    
+    particleCount = len(df_particlesLargestCluster)    
     
     
     #The line ID contains the value of the corresponding index
     particleIDToIndex = [-1]*(particleIDMax + 1)      
-    for particleIndex in range(0,particleNumber):
+    for particleIndex in range(0,particleCount):
          row = particleIDs[particleIndex]
          particleIDToIndex[row] = particleIndex      
          
