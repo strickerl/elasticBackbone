@@ -12,7 +12,7 @@ Purpose
 Algorithm
 ----------
     The elastic backbone is the load-bearing structure in a connected percolating colloidal system.
-    The code extracts the elastic backbone based on the burning algoritm, using two consecutive
+    The code extracts the elastic backbone based on the burning algorithm, using two consecutive
     burning loops. The burning loops require the choice of two points P1,P2 at the furthest
     extremities of the percolation cluster, i.e. the largest cluster. The first burning loop, from 
     P1 to P2, finds the minimum path connecting P1-P2. The second burning loop, from P2 to P1, finds 
