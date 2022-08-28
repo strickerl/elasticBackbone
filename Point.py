@@ -9,7 +9,6 @@ class Point:
 
     def __init__(self,coordinateX,coordinateY,coordinateZ):
 
-
         self.x   = float(coordinateX)
         self.y   = float(coordinateY)
         self.z   = float(coordinateZ)

@@ -48,10 +48,10 @@ def find_closest_particle_to_a_point(particles,pointP):
     distancesFromP = np.sqrt((x-xP)**2 + (y-yP)**2 + (z-zP)**2) 
     
     # Get the index (not the ID) of smallest element in numpy array 
-    indexClosestParticleToPointP= np.argmin(distancesFromP)
+    indexClosestParticleToP= np.argmin(distancesFromP)
     
     
-    ClosestParticleToPointP  = particles[indexClosestParticleToPointP]
+    ClosestParticleToP  = particles[indexClosestParticleToP]
     
     #return indexClosestParticleToPointP, coordinatesClosestParticleToPointP
     return ClosestParticleToPointP
