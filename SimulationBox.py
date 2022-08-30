@@ -13,33 +13,37 @@ reload(Point)
 from Point import Point
 
 
+
 class SimulationBox:
 
     def __init__(self,lengthX,lengthY,lengthZ):
 
 
-        self.lx   = float(lengthX)
-        self.ly   = float(lengthY)
-        self.lz   = float(lengthZ)
-        self.vertices = np.zeros(8, dtype=object)
-        self.fixedVertexPair = np.zeros(2, dtype=object)
+        self.lengthX   = float(lengthX)
+        self.lengthY   = float(lengthY)
+        self.lengthZ   = float(lengthZ)
+        self.nodes     = np.zeros(8, dtype=object)
+        self.fixedNodePair = np.zeros(2, dtype=object)
     
     
-    def findVertices(self):
+    def findNodes(self):
         
-        V1 = Point(0.,0.,0.)
-        V2 = Point(self.lx,0.,0.)
-        V3 = Point(0.,self.ly,0.)
-        V4 = Point(0.,0.,self.lz)
-        V5 = Point(self.lx,self.ly,0.)
-        V6 = Point(self.lx,0.,self.lz)
-        V7 = Point(0.,self.ly,self.lz)
-        V8 = Point(self.lx,self.ly,self.lz)
+        node0 = Point(0.,0.,0.)
+        node1 = Point(self.lx,0.,0.)
+        node2 = Point(0.,self.ly,0.)
+        node3 = Point(0.,0.,self.lz)
+        node4 = Point(self.lx,self.ly,0.)
+        node5 = Point(self.lx,0.,self.lz)
+        node6 = Point(0.,self.ly,self.lz)
+        node7 = Point(self.lx,self.ly,self.lz)
         
-        self.vertices = (V1,V2,V3,V4,V5,V6,V7,V8)
+        self.nodes = (node0,node1,node2,node3,node4,node5,node6,node7)
         
         
         
-    def defineFixedVerticesForBurningAlgorithm(self):
+    def defineFixedNodesToSetBackboneExtremes(self,parameters):
              
-        self.fixedVertexPair = self.vertices(0,7)
+        nodeStart = parameters.boxNodeStart
+        nodeEnd   = parameters.boxNodeEnd
+        
+        self.fixedNodePair = self.nodes(nodeStart,nodeEnd)

@@ -10,7 +10,6 @@ Created on Mon May  6 14:20:01 2022
 """
 import numpy as np
 from importlib import reload
-from IO_operations     import read_file
 from burning_algorithm import forward_burning
 from burning_algorithm import backward_burning
 
@@ -32,34 +31,23 @@ reload(Point)
 from Point import Point
 
 
-def find_closest_particle_to_a_point(particles,pointP):
+def find_closest_particle_to_point(particles,pointP):
     '''Function that finds the minimum distance between pointP (xP,yP,zP) and 
         all particles contained in a list'''  
            
-    x = [particles[index].x for index in range(0,len(particles))]   
-    y = [particles[index].y for index in range(0,len(particles))] 
-    z = [particles[index].z for index in range(0,len(particles))] 
-    
-    xP = pointP.x
-    yP = pointP.y
-    zP = pointP.z
-      
-    
-    distancesFromP = np.sqrt((x-xP)**2 + (y-yP)**2 + (z-zP)**2) 
-    
+    particleDistancesToPoint = np.asarray([p.get_distance_from_point(pointP) for p in particles])
+        
     # Get the index (not the ID) of smallest element in numpy array 
-    indexClosestParticleToP= np.argmin(distancesFromP)
+    indexClosestParticleToPoint= np.argmin(particleDistancesToPoint )
     
+    closestParticleToPoint = particles[indexClosestParticleToPoint]
     
-    ClosestParticleToP  = particles[indexClosestParticleToP]
-    
-    #return indexClosestParticleToPointP, coordinatesClosestParticleToPointP
-    return ClosestParticleToPointP
+    return closestParticleToPoint
 
 
 
 
-def find_start_end_points_for_burning_algorithm_P1_P2(Box,particles,FLAG_FIXED_EXTREMES_BACKBONE): 
+def find_start_end_particles_for_burning_algorithm(box,particles,parameters): 
     '''
     Find the particles P1,P2 to use as initial and final point for the 
     burning algorithm
@@ -77,75 +65,48 @@ def find_start_end_points_for_burning_algorithm_P1_P2(Box,particles,FLAG_FIXED_E
 
     Returns
     -------
-    StartEndParticlesBurningAlgorithm : CLASS
+    backboneExtremeParticles : CLASS
     '''
     
-    #Find vertices of 
-    Box.findVertices()   
 
+    box.findNodes()   
+    
 
-    if  FLAG_FIXED_EXTREMES_BACKBONE == 0:      #P1,P2 recalculated at each time        
+    if  parameters.use_constant_box_nodes_for_backbone_extremes:          
         
-        #Find the closest particles (of the largest cluster) to the vertices of the box
-        closestParticlesToVertices = [find_closest_particle_to_a_point(particles,Point) for Point in Box.vertices]
+        #Box can change size but the box node pair reamins constant 
+        box.defineFixedNodesToSetBackboneExtremes(box,parameters)  
+        fixedBoxNodes = box.fixedNodePair             
 
-
-        lengthDiagonalMax = 0.
+        #Find the closest particles (of the largest cluster) to the two fixed box vertices
+        backboneExtremes = np.asarray([find_closest_particle_to_point(particles,node) for node in fixedBoxNodes])
         
-        for index1, Particle1 in enumerate(closestParticlesToVertices):    
+    
+    
+    else: 
+
+        #Find closer particles (of the largest cluster) to box nodes (one per node)
+        closestParticlesToNodes = [find_closest_particle_to_point(particles,node) for node in box.nodes]
+
+        #Find the largest distance between particles close to box nodes
+        particleDistanceMax = 0.
+        
+        for index1, particle1 in enumerate(closestParticlesToNodes):    
             
-            for Particle2 in closestParticlesToVertices[index1+1:]:            
+            for particle2 in closestParticlesToNodes[index1+1:]:  
                 
-                Diagonal = ParticlePair(Particle1,Particle2)
+                particleDistance = particle1.distanceToParticle(particle2)
                 
-                if Diagonal.length > lengthDiagonalMax:
-                    lengthDiagonalMax = Diagonal.length
-                    StartEndParticlesBurningAlgorithm   = Diagonal
+                if particleDistance > particleDistanceMax:
+                    particleDistanceMax = particleDistance
+                    backboneExtremes    = np.array(particle1,particle2)
 
-    
-    
-    else:  #P1,P2 are the closest points to a fixed pair of vertices
 
-        #Box can change size but the vertex pair reamins constant 
-        Box.defineFixedVerticesForBurningAlgorithm(Box)  
-        fixedVertices = Box.fixedVertexPair             
-
-        #Find the closest particles (of the largest cluster) to the two fixed vertices of the box
-        closestParticlesToVertices = [find_closest_particle_to_a_point(particles,point) for point in fixedVertices]
-        
-        Particle1 = closestParticlesToVertices[0]
-        Particle2 = closestParticlesToVertices[1]
-        StartEndParticlesBurningAlgorithm = ParticlePair(Particle1,Particle2)
-  
-
-    return StartEndParticlesBurningAlgorithm
+    return backboneExtremes
 
  
 
-def Shift_origin_of_axes_of_box(x,y,z):
-    '''
-        Shift all particle coordinates (x,y,z) to that the new origin of the box 
-        coincides with min(x),min(y),min(z)
-
-    ''' 
-    
-    #Define new origin of axes based on particles' positions
-    x_min = np.min(x)
-    y_min = np.min(y)
-    z_min = np.min(z)
-
-
-    #Shift particle coordinates
-    x_shifted = x - x_min
-    y_shifted = y - y_min
-    z_shifted = z - z_min
-
-    return x_shifted, y_shifted, z_shifted
-
-
-
-
-def calculate_backbone_one_frame(folder,Name_files_IO,time,timeIndex,parameters):
+def calculate_backbone_one_frame(folder,fileNamesIO,time,timeIndex,parameters):
     '''             
     It calculates the elastic backbone for a single particle configuration, 
     corresponding to a single time instant, provided by a .dat file.
@@ -155,7 +116,7 @@ def calculate_backbone_one_frame(folder,Name_files_IO,time,timeIndex,parameters)
     ----------
     folder : STR
         path of the folder containing the code.
-    Name_files_IO : CLASS
+    nameFilesIO : CLASS
         it contains names of input and output files and the bare name.
     parameters : LIST
     
@@ -186,38 +147,38 @@ def calculate_backbone_one_frame(folder,Name_files_IO,time,timeIndex,parameters)
 
     '''    
     
+    import DataManager
+    reload(DataManager)
+    from DataManager import DataManager
+    
+    
     #User-defined parameters
     RADIUS_MIN = parameters[0]
     RADIUS_MAX = parameters[1]
     FLAG_FIXED_EXTREMES_BACKBONE = parameters[2]
     
     
-    #Import data from .dat file  
-    Box,Npart,IDpart,chemType,x,y,z,radius,vol,Nneighb,IDneighb,ID_to_index =\
-        read_file(RADIUS_MIN,RADIUS_MAX,Name_files_IO)
+    DM = DataManager()
+    DM.load_data_from_simulation_file(fileNamesIO.input)
+
       
-    
-    #Shift box so that origin coincides with min particle coordinate min(x,y,z)
-    x,y,z = Shift_origin_of_axes_of_box(x,y,z)
-    
-    #Particles = Shift_origin_of_axes_of_box(Particles)
+    #Shift box so that origin coincides with min(x,y,z) of particles
+    DM.shift_origin_of_axes()
+
     
    
     # CALCULATE ELASTIC BACKBONE
     #------------------------------
     #Define initial and final points for burning algorithm: P1,P2
     # kk_P1, kk_P2 = Indexes of P1,P2
-    StartEndParticles = find_start_end_points_for_burning_algorithm_P1_P2\
-                        (Box,particles,FLAG_FIXED_EXTREMES_BACKBONE)
+    backboneExtremes = find_start_end_particles_for_burning_algorithm\
+                       (box,particles,parameters)
     
-    
-    #P1,P2 = Find_Points_P1_P2(Box,Particles,flag_fixed_P1P2)
-
     
     #Burning loop 1: from P1 to P2 
     #   find length of elastic backbone = min N of connected particles and min path P1-P2
-    BurningTime,MinN_P1P2,MinPath_P1P2,points = forward_burning\
-        (x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_to_index,Lx_box,Ly_box,Lz_box)    
+    BurningTime,MinN_P1P2,MinPath_P1P2,forwardBurningTimes = forward_burning\
+        (DM,particles,backboneExtremes,box)    
         
     #resultsLoop1 =  First_burning_loop_from_P1_to_P2(Particles,P1,P2,box)  
 
@@ -225,7 +186,7 @@ def calculate_backbone_one_frame(folder,Name_files_IO,time,timeIndex,parameters)
     #Burning loop 2: from P2 to P1
     #  find the whole elastic backbone, i.e. all equivalent shortest path between P1,P2
     BurningTime_2,MinN_P2P1,N_ElasticBackbone,points_2 = backward_burning\
-        (x,y,z,P1,P2,kk_P1,kk_P2,Npart,IDneighb,ID_to_index,Lx_box,Ly_box,Lz_box,points)
+        (particles,backboneExtremeParticles,ID_to_index,box,forwardBurningTimes)
 
     #resultsLoop2 = Second_burning_loop_from_P2_to_P1(Particles,P1,P2,box,resultsLoop1)
 
