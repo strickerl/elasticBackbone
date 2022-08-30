@@ -37,7 +37,7 @@ summaryOutputFile  = folder + '/Output/' + fileNameSummary
 fileSummaryOuputHandler = open(summaryOutputFile,'w')
 
 #Create instance of class
-BackboneAllTimes = BackboneTimeEvolution(fileCount)
+backboneAllTimes = BackboneTimeEvolution(fileCount)
 
 
 #Loop over time instants
@@ -46,15 +46,15 @@ for fileName in inputFileList:
     timeIndex = timeIndex + 1
     time      = int("".join(filter(str.isdigit, fileName)))  #Extract time from file name
     
-    FilesIO = define_file_names(folder,path,fileName)        #For input/output
-    print(FilesIO.raw)       
+    filesIO = define_file_names(folder,path,fileName)        #For input/output
+    print(filesIO.raw)       
     
-    BackboneOneFrame = calculate_backbone_one_frame(path,FilesIO,time,timeIndex,parameters) 
+    backboneOneFrame = calculate_backbone_one_frame(path,filesIO,time,timeIndex,parameters) 
      
-    BackboneOneFrame.printFile(fileSummaryOuputHandler)   
+    backboneOneFrame.printFile(fileSummaryOuputHandler)   
     
-    BackboneAllTimes.all[timeIndex] = BackboneOneFrame  
+    backboneAllTimes.values[timeIndex] = backboneOneFrame  
 
      
 fileSummaryOuputHandler.close()                        
-BackboneAllTimes.printOnScreen()
+backboneAllTimes.printOnScreen()
