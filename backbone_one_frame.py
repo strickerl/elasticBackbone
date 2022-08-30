@@ -37,7 +37,7 @@ def find_closest_particle_to_point(particles,pointP):
            
     particleDistancesToPoint = np.asarray([p.get_distance_from_point(pointP) for p in particles])
         
-    # Get the index (not the ID) of smallest element in numpy array 
+    # Get the index (not the ID) of particle with smallest distance to pointP 
     indexClosestParticleToPoint= np.argmin(particleDistancesToPoint )
     
     closestParticleToPoint = particles[indexClosestParticleToPoint]
@@ -47,7 +47,7 @@ def find_closest_particle_to_point(particles,pointP):
 
 
 
-def find_start_end_particles_for_burning_algorithm(box,particles,parameters): 
+def find_start_end_particles_for_burning_algorithm(box,particles,parameters,backbone): 
     '''
     Find the particles P1,P2 to use as initial and final point for the 
     burning algorithm
@@ -55,22 +55,18 @@ def find_start_end_particles_for_burning_algorithm(box,particles,parameters):
 
     Parameters
     ----------
-    Box : CLASS(SimulationBox)
-    
-    particles : LIST of CLASSES(Particle)
-        
-    FLAG_FIXED_EXTREMES_BACKBONE : INT
-        vertices of simulation box used to calculate start/end points for burning algorithm are
-        1:  always the same  0: recalculated at each time 
+    box : OBJECT(SimulationBox)
+    particles : ARRAY of OBJECTS(Particle) = particles of the largest cluster
+    parameters: OBJECT(Parameters)    
+
 
     Returns
     -------
-    backboneExtremeParticles : CLASS
+    backboneExtremeParticles : array(2,OBJECT(Particle))
     '''
     
 
     box.findNodes()   
-    
 
     if  parameters.use_constant_box_nodes_for_backbone_extremes:          
         
@@ -78,19 +74,17 @@ def find_start_end_particles_for_burning_algorithm(box,particles,parameters):
         box.defineFixedNodesToSetBackboneExtremes(box,parameters)  
         fixedBoxNodes = box.fixedNodePair             
 
-        #Find the closest particles (of the largest cluster) to the two fixed box vertices
+        #Find the closest particles to the two fixed box vertices
         backboneExtremes = np.asarray([find_closest_particle_to_point(particles,node) for node in fixedBoxNodes])
         
     
-    
     else: 
 
-        #Find closer particles (of the largest cluster) to box nodes (one per node)
+        #Find closer particles to box nodes (one per node)
         closestParticlesToNodes = [find_closest_particle_to_point(particles,node) for node in box.nodes]
 
-        #Find the largest distance between particles close to box nodes
-        particleDistanceMax = 0.
-        
+        #Find particle pair further apart
+        particleDistanceMax = 0.        
         for index1, particle1 in enumerate(closestParticlesToNodes):    
             
             for particle2 in closestParticlesToNodes[index1+1:]:  
@@ -102,125 +96,94 @@ def find_start_end_particles_for_burning_algorithm(box,particles,parameters):
                     backboneExtremes    = np.array(particle1,particle2)
 
 
-    return backboneExtremes
+    backbone.extremes = backboneExtremes
+    backbone.calculateLinearDistanceBetweenExtremes()
+
 
  
 
-def calculate_backbone_one_frame(folder,fileNamesIO,time,timeIndex,parameters):
+def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
     '''             
     It calculates the elastic backbone for a single particle configuration, 
     corresponding to a single time instant, provided by a .dat file.
 
-
     Parameters
     ----------
-    folder : STR
-        path of the folder containing the code.
-    nameFilesIO : CLASS
-        it contains names of input and output files and the bare name.
-    parameters : LIST
+    nameFilesIO : OBJECT(NameFilesIO)
+        it contains names of input/output files and the bare name.
+    parameters : OBJECT(Parameter)
+    time : FLOAT
+    timeIndex : INT
     
-
     Returns
     -------
-     CLASS(Backbone)
-         BackboneOneFrame = summary of info on backbone for one time instant   
+     backbone = OBJECT(Backbone)
+         summary of general info on backbone for one time instant   
     
-    Input
-    -----    
+    
+    Input file
+    ----------    
     File with an instantaneous particle configuration, with the data structure:
         
         Number of particles
         [empty line]
-        particleID   particleType   positionX   positionY   positionZ   paricleVolume   clusterID   numberOfNeighbours   listOfNeighbourIDs (variable length)
+        particleID   particleType   positionX   positionY   positionZ   particleVoronoiVolume   clusterID   numberOfNeighbours   listOfNeighbourIDs(variable length)
+        particleID   particleType   positionX   positionY   positionZ   particleVoronoiVolume   clusterID   numberOfNeighbours   listOfNeighbourIDs(variable length)
         ...
 
-    Output
-    -------    
-     This code an output .dat file that can be used as input in the 
-     Ovito visualization tool and has the following structure:
+
+    Output file
+    -----------    
+     .xyz file that can be used as input in the Ovito visualization tool
+     and has the following structure:
          
-         Number of particles
+         numberOfParticle
          [empty line]
-         positionX   positionY   positionZ  chemicalType   particleRadius  particleBurningTimeInLoop1 particleBurningTimeInLoop2  particleID
-         ....
+         positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
+         positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
+         ...
 
     '''    
-    
     import DataManager
     reload(DataManager)
     from DataManager import DataManager
     
-    
-    #User-defined parameters
-    RADIUS_MIN = parameters[0]
-    RADIUS_MAX = parameters[1]
-    FLAG_FIXED_EXTREMES_BACKBONE = parameters[2]
+    from my_enum import enum
+    CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
     
     
     DM = DataManager()
     DM.load_data_from_simulation_file(fileNamesIO.input)
-
-      
+    
+    
+    #Retain only particles belonging to largest cluster
+    DM.filter_particles_by_cluster_ID(CLUSTER_ID.LARGEST_CLUSTER)
+    
+    #Conversion table: particle ID --> index
+    DM.set_particle_index_from_ID_lookup()
+       
     #Shift box so that origin coincides with min(x,y,z) of particles
     DM.shift_origin_of_axes()
 
     
-   
     # CALCULATE ELASTIC BACKBONE
-    #------------------------------
-    #Define initial and final points for burning algorithm: P1,P2
-    # kk_P1, kk_P2 = Indexes of P1,P2
-    backboneExtremes = find_start_end_particles_for_burning_algorithm\
-                       (box,particles,parameters)
+    #---------------------------
+    backbone = Backbone(timeIndex,time)
+    
+    find_start_end_particles_for_burning_algorithm(DM.box,DM.particles,parameters,backbone)
     
     
-    #Burning loop 1: from P1 to P2 
-    #   find length of elastic backbone = min N of connected particles and min path P1-P2
-    BurningTime,MinN_P1P2,MinPath_P1P2,forwardBurningTimes = forward_burning\
-        (DM,particles,backboneExtremes,box)    
-        
-    #resultsLoop1 =  First_burning_loop_from_P1_to_P2(Particles,P1,P2,box)  
-
+    #Find backbone length = min # connected particles and min path between extremes
+    forward_burning(DM.particles,DM.box,backbone)    
     
-    #Burning loop 2: from P2 to P1
-    #  find the whole elastic backbone, i.e. all equivalent shortest path between P1,P2
-    BurningTime_2,MinN_P2P1,N_ElasticBackbone,points_2 = backward_burning\
-        (particles,backboneExtremeParticles,ID_to_index,box,forwardBurningTimes)
-
-    #resultsLoop2 = Second_burning_loop_from_P2_to_P1(Particles,P1,P2,box,resultsLoop1)
-
+    #Find whole backbone = all equivalent paths between extremes
+    backward_burning(DM.particles,DM.box,backbone)
     
-    #Check that Min N particles is the same in loop 1 and loop 2
-    assert MinN_P1P2 ==  MinN_P2P1,'Min N particles is != in loop 1 and loop 2\n' \
-         f'time={time}:  Min N loop 1 ={MinN_P1P2}, Min N loop 2 = {MinN_P2P1}'
+    backbone.checkForErrors()
 
 
-    #CALCULATE LINEAR DISTANCE BETWEEN POINTS P1,P2
-    #Coordinates of points P1,P2
-    xP1 = P1[0]
-    yP1 = P1[1]
-    zP1 = P1[2]
-    xP2 = P2[0]
-    yP2 = P2[1]
-    zP2 = P2[2]
-    dist_P1P2 = np.sqrt((xP1-xP2)**2 + (yP1-yP2)**2 + (zP1-zP2)**2) 
-      
-     
-    #OUTPUT
-    f_out = open(Name_files_IO.output,'w')
-    print(Npart,file = f_out)
-    print(file = f_out)
-    for i in range(0,Npart):
-         print(x[i],y[i],z[i],chemType[i],radius[i],points[i],points_2[i],IDpart[i],file = f_out)
-    f_out.close()
+    DM.printXYZFile(DM.particles,fileNamesIO.output)
     
     
-    BackboneOneFrame = Backbone(timeIndex,time,MinN_P2P1,MinPath_P1P2,\
-                                N_ElasticBackbone,dist_P1P2,Npart)
-    
-    
-    
-    
-    
-    return BackboneOneFrame
+
+    return backbone

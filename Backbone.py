@@ -8,24 +8,40 @@ Created on Wed Aug 24 23:57:04 2022
 import numpy as np
 import matplotlib.pyplot as plt
 
+from importlib import reload
+
+import Particle
+reload(Particle)
+from Particle import Particle
+
 
 class Backbone:
 
-    def __init__(self,timeIndex,time,minParticleCount,minConnectedPath ,\
-                      totalParticleCount,linearDistanceExtremes,\
-                      largestClusterParticleCount):
+    def __init__(self,timeIndex,time,particles):
 
 
-        self.timeIndex          = timeIndex
-        self.time               = time
-        self.minParticleCount   = minParticleCount
-        self.minConnectedPath   = minConnectedPath 
-        self.totalParticleCount = totalParticleCount
-        self.linearDistanceExtremes      = linearDistanceExtremes
-        self.largestClusterParticleCount = largestClusterParticleCount
+        self.timeIndex              = timeIndex
+        self.time                   = time
+        self.minPathParticleCount   = int
+        self.minPathLength          = float
+        self.extremes               = np.ndarray((2,), object = Particle)
+        self.linearDistanceExtremes   = float()
+        self.allMinPathsParticleCount = int
+        self.largestClusterParticleCount = len(particles)
+        self.forwardBurning        = object(BurningRound)
+        self.backwardBurning       = object(BurningRound)
+        
 
-            
-    def printFile(self,fileHandler):
+    def calculateLinearDistanceBetweenExtremes(self):
+        
+        particle1 = self.extremes[0]
+        particle2 = self.extremes[1]
+        
+        self.linearDistanceExtremes = particle1.distanceToParticle(particle2)
+
+        
+
+    def printFileSummary(self,fileHandler):
                 
         print("{:6d}".format(self.timeIndex),\
               "{:.2f}".format(self.time),\
@@ -38,11 +54,34 @@ class Backbone:
 
 
 
-class BackboneTimeEvolution:
+
+    def checkForErrors(self):
+       
+       particleCountForward = self.forwardBurning.particleCount
+       particleCountBackward = self.backwardBurning.particleCount
+       
+       assert particleCountForward == particleCountBackward,\
+           'Min # particles is != in forward and backward burning\n' \
+            f'time={self.time}\n'\
+            f'forward burning particle # ={particleCountForward}, \n'\
+            f'backward burning particle # = {particleCountBackward}'
+
+
+
+class BurningRound:
+    
+    def __init__(self,particleCount):
+
+        self.particleCount = particleCount
+
+
+
+
+class BackboneAllTimes:
     
     def __init__(self,timeCount):
     
-        self.allTimes   = np.zeros(timeCount, dtype=object)
+        self.values    = np.zeros(timeCount, dtype=object)
         self.timeCount = timeCount
 
 

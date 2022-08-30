@@ -11,7 +11,6 @@ import os
 import re
 from importlib import reload
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from dataclasses import make_dataclass
 
@@ -29,24 +28,22 @@ def natural_sort(l):
 
 
 
-def define_file_names(folder,path,file_name):
+def define_file_names(folder,path,fileName):
     '''Define name of input and output files, given the path'''    
 
 
-    input_filename = path + file_name
-    
     #Extract raw name, without .dat extension
-    raw_filename = file_name[0:len(file_name)-4]
-    
-    #Define name of output file
-    output_filename = folder + '/Output/' + raw_filename + '.xyz'
+    rawFileName = fileName[0:len(fileName)-4]
+
+    inputFileName  = path   + fileName    
+    outputFileName = folder + '/Output/' + rawFileName + '.xyz'
         
     
     #Create class with name of files
-    Name_files = make_dataclass('Name_files', ['input', 'output', 'raw'])
+    fileNames = make_dataclass('fileNames', ['input', 'output', 'raw'])
     
     #Create and return instance of class Name_files
-    return Name_files(input_filename, output_filename, raw_filename)
+    return fileNames(inputFileName, outputFileName, rawFileName)
 
 
 
@@ -71,145 +68,6 @@ def extract_input_file_list():
 
 
     return list_files_atoms,nfiles,path
-
-
-
-
-def read_file(rMin,rMax,Name_files):
-
-    '''Read files
-    
-    Input
-    -----
-    
-    
-    Output
-    ------
-    int
-        Npart
-        
-    Class(SimulationBox)    
-        Box
-                 
-    list (int)    
-        IDpart   = identifiers of particles
-        chemType = type of particles (large/small)
-        Nneighb  = number of neighbours of particles
-        
-    list (float)    
-        x,y,z  = position of particle centers
-        radius = radii of particles
-        vol    = Voronoi volumes of particles
-        
-        IDneighb,ID_to_index
-    
-    '''
-       
-    #Read general info on the first line of configuration file:
-    #  Number of clusters    Box length x    Box length y    Box length z    
-    #-----------------------------------------------------------------------------
-    inputfile  = open(Name_files.input,'r')
-    first_line = inputfile.readline()
-    line_list = first_line.split()            #Convert string into array of numbers
-    map_object = map(float, line_list)
-    list_of_numbers = list(map_object)
-    Npart  = int(list_of_numbers[0])          #Number of particles
-    Nclust = int(list_of_numbers[1])          #Number of clusters
-    lengthBoxX = list_of_numbers[2]               #Length x of the box
-    lengthBoxY = list_of_numbers[3]               #Length y of the box
-    lengthBoxZ = list_of_numbers[4]               #Length z of the box 
-       
-    Box = SimulationBox(lengthBoxX,lengthBoxY,lengthBoxZ)   
-       
-       
-       
-    #Read file into a data frame
-    df = pd.read_fwf(inputfile, header=None, infer_nrows=Npart)      
-    inputfile.close()
-    
-    # Npart  = df.iloc[0,0]       #Number of particles
-    # Nclust = df.iloc[0,1]       #Number of clusters
-    # Lx_box = df.iloc[0,2]       #Length x of the box
-    # Ly_box = df.iloc[0,3]       #Length y of the box
-    # Lz_box = df.iloc[0,4]    
-    
-    # df_particles = df[df["Index"] > 0]
-    # df_particles_largest_cluster = df[df["IDcluster"] == 1]
-      
-        
-    # Name of columns in the dataframe
-    namesCol = ["IDparticle", "chemicalType", "x", "y", "z", "volume", "IDcluster", "N_neighbours"]
-    myDict = {i : namesCol[i] for i in range(0,8)}
-    df = df.rename(columns=myDict)
-    
-
-    
-    #Load data from file
-    df_particlesLargestCluster = df[df["IDcluster"] == 1]
-    particleID   = list(df_particlesLargestCluster['IDparticle'])
-    chemicalType = list(df_particlesLargestCluster['chemicalType'])
-    x            = list(df_particlesLargestCluster['x'])
-    y            = list(df_particlesLargestCluster['y'])
-    z            = list(df_particlesLargestCluster['z'])
-    volume       = list(df_particlesLargestCluster['volume'])
-    NumberOfNeighbours  = list(df_particlesLargestCluster['N_neighbours'])
-
-    particleNumber    = len(df_particlesLargestCluster)    #Number of particles
-
-
-    #List of list of neighbours of particles belonging to the largest cluster
-    neighbourIDs = [ df_particlesLargestCluster.iloc[index,8:].dropna().astype('int64').tolist() \
-                     for index in range(0,particleNumber) ]
-
-           
-    #Create vector with radii of particles of largest cluster
-    radius = [rMin if chemicalType[particleIndex] == 1 else rMax \
-              for particleIndex in range(0,particleNumber)]  # list comprehension
-    
-    
-    #Conversion ID to index
-    particleIDToIndex = Create_conversion_table_from_particle_ID_to_index\
-                        (particleID,df_particlesLargestCluster)
-    
-    
-    
-    return Box,particleNumber,particleID,chemicalType,x,y,z,radius,volume,\
-           NumberOfNeighbours,neighbourIDs,particleIDToIndex
-
-
-
-
-def Create_conversion_table_from_particle_ID_to_index(particleIDs,df_particlesLargestCluster):
-    '''
-
-     
-    Identifier ID (=number) of particle is assigned based on the list of all
-    particles, including those that do not belong to the largest cluster
-    In the conversion table, each line ID contains the index of the particle 
-    in the lists with the info on the largest cluster only. The lines of the 
-    corresponding to particles not belonging to the largest cluster 
-    are filled with -1
-    '''   
-    
-    
-    particleIDMax  = df_particlesLargestCluster["IDparticle"].max() 
-    
-    #Number of particles
-    particleCount = len(df_particlesLargestCluster)    
-    
-    
-    #The line ID contains the value of the corresponding index
-    particleIDToIndex = [-1]*(particleIDMax + 1)      
-    for particleIndex in range(0,particleCount):
-         row = particleIDs[particleIndex]
-         particleIDToIndex[row] = particleIndex      
-         
-    particleIDToIndex  = list(map(int,particleIDToIndex))   
-    
-    
-    
-    return particleIDToIndex
-
 
 
 

@@ -31,11 +31,13 @@ class Particle:
         y = float(particle_data_string[FIELDS.Y])
         z = float(particle_data_string[FIELDS.Z])
         self.position = Vector(x, y, z)
+        self.radius = float()
         self.volume = float(particle_data_string[FIELDS.VOLUME])
         self.clusterID = int(particle_data_string[FIELDS.CLUSTER_ID])
         self.neighbourCount = int(particle_data_string[FIELDS.NEIGHBOUR_COUNT])
         self.neighboursIds = np.ndarray((self.neighbourCount,), dtype=int)
            
+        
         for neighbourIndex in range(0, self.neighbourCount):
             self.neighboursIds[neighbourIndex] = int(particle_data_string[FIELDS.FIRST_NEIGHBOUR + neighbourIndex])
         
@@ -75,7 +77,18 @@ class Particle:
         return d2**0.5      
         
 
-
+    def printOnFile(self,outputFileHandler): 
+          
+        print(self.position.x,\
+              self.position.y,\
+              self.position.z,\
+              self.chemicalType,\
+              self.radius,\
+              self.forwardBurningTime,\
+              self.backwardBurningTime,\
+              self.particleID,\
+              file = outputFileHandler)
+          
 
         
         

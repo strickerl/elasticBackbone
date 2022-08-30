@@ -21,6 +21,6 @@ class Parameters:
         self.boxNodeEnd   = NODE_END
 
 
-    def use_constant_box_nodes_to_set_backbone_extremes(self):
+    def use_constant_box_nodes_for_backbone_extremes(self):
         '''to know what is currently set'''
         return (self.backbone_extremes_flag == CLOSEST_BOX_NODES.CONSTANT_FOR_ALL_TIMES)
