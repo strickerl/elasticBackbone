@@ -10,8 +10,8 @@ Created on Mon May  6 14:20:01 2022
 """
 import numpy as np
 from importlib import reload
-from burning_algorithm import forward_burning
-from burning_algorithm import backward_burning
+from burning_algorithm import forwardBurning
+from burning_algorithm import backwardBurning
 
 
 import Backbone
@@ -24,14 +24,14 @@ from SimulationBox import SimulationBox
 
 import Particle
 reload(Particle)
-from Particle import Particle, ParticlePair
+from Particle import Particle
 
 import Point
 reload(Point)
 from Point import Point
 
 
-def find_closest_particle_to_point(particles,pointP):
+def findClosestParticleToPoint(particles,pointP):
     '''Function that finds the minimum distance between pointP (xP,yP,zP) and 
         all particles contained in a list'''  
            
@@ -47,7 +47,7 @@ def find_closest_particle_to_point(particles,pointP):
 
 
 
-def find_start_end_particles_for_burning_algorithm(box,particles,parameters,backbone): 
+def findBurningAlgorithmExtremes(box,particles,parameters,backbone): 
     '''
     Find the particles P1,P2 to use as initial and final point for the 
     burning algorithm
@@ -75,13 +75,13 @@ def find_start_end_particles_for_burning_algorithm(box,particles,parameters,back
         fixedBoxNodes = box.fixedNodePair             
 
         #Find the closest particles to the two fixed box vertices
-        backboneExtremes = np.asarray([find_closest_particle_to_point(particles,node) for node in fixedBoxNodes])
+        backboneExtremes = np.asarray([findClosestParticleToPoint(particles,node) for node in fixedBoxNodes])
         
     
     else: 
 
         #Find closer particles to box nodes (one per node)
-        closestParticlesToNodes = [find_closest_particle_to_point(particles,node) for node in box.nodes]
+        closestParticlesToNodes = [findClosestParticleToPoint(particles,node) for node in box.nodes]
 
         #Find particle pair further apart
         particleDistanceMax = 0.        
@@ -102,7 +102,7 @@ def find_start_end_particles_for_burning_algorithm(box,particles,parameters,back
 
  
 
-def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
+def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     '''             
     It calculates the elastic backbone for a single particle configuration, 
     corresponding to a single time instant, provided by a .dat file.
@@ -170,14 +170,14 @@ def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
     #---------------------------
     backbone = Backbone(timeIndex,time)
     
-    find_start_end_particles_for_burning_algorithm(DM.box,DM.particles,parameters,backbone)
+    findBurningAlgorithmExtremes(DM.box,DM.particles,parameters,backbone)
     
     
     #Find backbone length = min # connected particles and min path between extremes
-    forward_burning(DM,backbone)    
+    forwardBurning(DM,backbone)    
     
     #Find whole backbone = all equivalent paths between extremes
-    backward_burning(DM,backbone)
+    backwardBurning(DM,backbone)
     
     backbone.checkForErrors()
 

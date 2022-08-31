@@ -25,11 +25,11 @@ class Backbone:
         self.minPathParticleCount   = int
         self.minPathLength          = float
         self.extremes               = np.ndarray((2,), object = Particle)
-        self.linearDistanceExtremes   = float()
+        self.linearDistanceExtremes = float()
         self.allMinPathsParticleCount = int
         self.largestClusterParticleCount = len(particles)
-        self.forwardBurnParticleCount = int
-        self.forwardBurnParticleCount = int
+        self.forwardMinParticleCount  = int
+        self.backwardMinParticleCount = int
         
 
     def calculateLinearDistanceBetweenExtremes(self):
@@ -61,16 +61,21 @@ class Backbone:
             f'time={self.time}\n'\
             f'forward burning particle # ={self.forwardBurnParticleCount}, \n'\
             f'backward burning particle # = {self.backwardBurnParticleCount}'
+            
+       self.minPathParticleCount  = self.forwardBurnParticleCount
 
+
+
+    def getSummaryBackwardBurning(self,endParticle,burntParticleCountTot):
+     
+        self.backwardMinParticleCount = endParticle.backwardBurningTime
+        self.allMinPathsParticleCount = burntParticleCountTot
        
            
 
-    def getSummaryForwardBurning(self,particles,startParticle,endParticle):
+    def getSummaryForwardBurning(self,particles,endParticle):
 
-        endParticleIndex = endParticle.index         
-
-        self.forwardBurnParticleCount = particles[endParticleIndex]
-        self.minPathParticleCount     = self.forwardBurnParticleCount
+        self.forwardMinParticleCount = endParticle.forwardBurningTime
         self.minPathLength = self.getMinPathLength(particles,endParticle)
 
 
@@ -96,6 +101,7 @@ class Backbone:
 
 
 class BackboneAllTimes:
+
     
     def __init__(self,timeCount):
     
@@ -103,20 +109,22 @@ class BackboneAllTimes:
         self.timeCount = timeCount
 
 
+
     def setValuesOneFrame(self,timeIndex):
         
-        self.all[timeIndex] = Backbone
+        self.values[timeIndex] = Backbone
+
         
 
     def printOnScreen(self):
 
         timeCount  =  self.timeCount
-        time                    = [self.allTimes[timeIndex].time for timeIndex in range(0,timeCount)]        
-        nParticleMinBackbone    = [self.allTimes[timeIndex].minParticleCount for timeIndex in range(0,timeCount)] 
-        nParticleTotBackbone    = [self.allTimes[timeIndex].totalParticleCount for timeIndex in range(0,timeCount)] 
-        nParticleLargestCluster = [self.allTimes[timeIndex].largestClusterParticleCount for timeIndex in range(0,timeCount)] 
-        connectedLengthMin      = [self.allTimes[timeIndex].minPathLength for timeIndex in range(0,timeCount)]
-        linearDistance          = [self.allTimes[timeIndex].linearDistanceExtremes for timeIndex in range(0,timeCount)]
+        time                    = [self.values[timeIndex].time for timeIndex in range(0,timeCount)]        
+        nParticleMinBackbone    = [self.values[timeIndex].minParticleCount for timeIndex in range(0,timeCount)] 
+        nParticleTotBackbone    = [self.values[timeIndex].totalParticleCount for timeIndex in range(0,timeCount)] 
+        nParticleLargestCluster = [self.values[timeIndex].largestClusterParticleCount for timeIndex in range(0,timeCount)] 
+        connectedLengthMin      = [self.values[timeIndex].minPathLength for timeIndex in range(0,timeCount)]
+        linearDistance          = [self.values[timeIndex].linearDistanceExtremes for timeIndex in range(0,timeCount)]
 
         ax = plt.figure(1)
         line1, = plt.plot(time, nParticleMinBackbone,'r')
