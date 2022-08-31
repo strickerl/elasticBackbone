@@ -27,7 +27,7 @@ from SimulationBox import SimulationBox
 
 
 
-class BackboneTimeEvolution:
+class BackboneAllTimesResults : 
 
     
     def __init__(self,timeCount):
@@ -52,7 +52,7 @@ class BackboneTimeEvolution:
         connectedLengthMin      = np.asarray([backbone.minPathLength          for backbone in self.values])
         linearDistance          = np.asarray([backbone.linearDistanceExtremes for backbone in self.values])
 
-        ax = plt.figure(1)
+        ax = plt.figure(10)
         line1, = plt.plot(time, nParticleMinBackbone,'r')
         line2, = plt.plot(time, nParticleTotBackbone,'b')
         plt.xlabel('Time')
@@ -62,19 +62,19 @@ class BackboneTimeEvolution:
         line2.set_label('Tot # particles elastic backbone')
         ax.legend()
     
-        plt.figure(2)
+        plt.figure(20)
         plt.plot(time, nParticleMinBackbone/nParticleLargestCluster)
         plt.xlabel('Time')
         plt.ylabel('Min # particles P1P2/ Tot # particles cluster')
         plt.show()
     
-        plt.figure(3)
+        plt.figure(30)
         plt.plot(time, connectedLengthMin)
         plt.xlabel('Time')
         plt.ylabel('Min connected path P1P2 [Length]')
         plt.show()
     
-        plt.figure(4)
+        plt.figure(40)
         plt.plot(time, connectedLengthMin/linearDistance)
         plt.xlabel('Time')
         plt.ylabel('Min connected path / linear distance (P1P2) ')

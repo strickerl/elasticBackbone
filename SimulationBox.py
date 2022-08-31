@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Aug 27 02:44:37 2022
-
 @author: Laura Stricker, laura.stricker@mat.ethz.ch
 """
 
@@ -40,10 +39,10 @@ class SimulationBox:
         
         #     Front:         Back:
         #    7     6        3     2  
-        #    x_____x        x_____x
+        #    +_____+        +_____+
         #    |     |        |     |
         #    |     |        |     |
-        #    x_____x        x_____x
+        #    +_____+        +_____+
         #    4     5        0     1
         
         

@@ -9,8 +9,8 @@ Created on Sat Aug 27 03:26:58 2022
 from importlib import reload
 import numpy as np
 
-from my_enum import enum
-from fields import FIELDS, HEADER_FIELDS
+from myEnum import enum
+from columns import COLUMN_NAMES, HEADER_COLUMN_NAMES
 
 import Vector
 reload(Vector)
@@ -29,64 +29,40 @@ class Particle:
     
     def __init__(self, particle_data_string):
                                                    
-        self.particleID = int(particle_data_string[FIELDS.PARTICLE_ID])
-        self.chemicalType = int(particle_data_string[FIELDS.CHEMICAL_TYPE])
-        x = float(particle_data_string[FIELDS.X])
-        y = float(particle_data_string[FIELDS.Y])
-        z = float(particle_data_string[FIELDS.Z])
+        self.particleID = int(particle_data_string[COLUMN_NAMES.PARTICLE_ID])
+        self.chemicalType = int(particle_data_string[COLUMN_NAMES.CHEMICAL_TYPE])
+        x = float(particle_data_string[COLUMN_NAMES.X])
+        y = float(particle_data_string[COLUMN_NAMES.Y])
+        z = float(particle_data_string[COLUMN_NAMES.Z])
         self.position = Vector(x, y, z)
         self.radius = float
-        self.volume = float(particle_data_string[FIELDS.VOLUME])
-        self.clusterID = int(particle_data_string[FIELDS.CLUSTER_ID])
-        self.neighbourCount = int(particle_data_string[FIELDS.NEIGHBOUR_COUNT])
+        self.volume = float(particle_data_string[COLUMN_NAMES.VOLUME])
+        self.clusterID = int(particle_data_string[COLUMN_NAMES.CLUSTER_ID])
+        self.neighbourCount = int(particle_data_string[COLUMN_NAMES.NEIGHBOUR_COUNT])
         self.neighbourIDs = np.ndarray((self.neighbourCount,), dtype=int)
         
         for neighbourIndex in range(0, self.neighbourCount):
-            self.neighbourIDs[neighbourIndex] = int(particle_data_string[FIELDS.FIRST_NEIGHBOUR + neighbourIndex])
+            self.neighbourIDs[neighbourIndex] =    \
+            int(particle_data_string[COLUMN_NAMES.FIRST_NEIGHBOUR + neighbourIndex])
 
         self.index = int
         self.forwardBurningTime  = 0
         self.backwardBurningTime = 0
         self.isBurntByParticleIndex = None
 
-    
-    
-    def display(self):
-        
-        print('ID: {}'.format(self.particleID))
-        print('chemicalType: {}'.format(self.chemicalType))
-        print('pos: {} {} {}'.format(self.position.x, self.position.y, self.position.z))
-        print('volume: {}'.format(self.volume))
-        print('clusterID: {}'.format(self.clusterID))
-        print('neighbourCount: {}'.format(self.neighbourCount))
-        
-        for neighbourIndex in range(0, self.neighbourCount):
-            print('{}, '.format(self.neighbours[neighbourIndex]))
-         
-             
+
             
-    def distanceToParticle(self, particle): 
-          
-        dx = self.position.x - particle.position.x
-        dy = self.position.y - particle.position.y
-        dz = self.position.z - particle.position.z
+    def distanceTo(self, point): 
+        #point can be a Point or a Particle  
+        
+        dx = self.position.x - point.position.x
+        dy = self.position.y - point.position.y
+        dz = self.position.z - point.position.z
           
         d2 = dx*dx + dy*dy + dz*dz
           
         return d2**0.5      
     
-
-
-    def distanceToPoint(self, point = Point): 
-        
-        dx = self.position.x - point.x
-        dy = self.position.y - point.y
-        dz = self.position.z - point.z
-        
-        d2 = dx*dx + dy*dy + dz*dz
-        
-        return d2**0.5
-
 
 
     def isBurnt(self):
@@ -109,20 +85,6 @@ class Particle:
 
 
 
-    def printOnFile(self,outputFileHandler): 
-        
-        print(self.position.x,\
-              self.position.y,\
-              self.position.z,\
-              self.chemicalType,\
-              self.radius,\
-              self.forwardBurningTime,\
-              self.backwardBurningTime,\
-              self.particleID,\
-              file = outputFileHandler)
-
-
-
     def resetBurningStatus(self):
         
         self.isBurntByParticleIndex = None
@@ -137,3 +99,33 @@ class Particle:
     def setParticleRadius(self,parameters):
         
         self.radius = parameters.radiusMin if self.chemicalType==1 else parameters.radiusMax
+        
+        
+    #Debug/output-related method        
+    def display(self):
+        
+        print('ID: {}'.format(self.particleID))
+        print('chemicalType: {}'.format(self.chemicalType))
+        print('pos: {} {} {}'.format(self.position.x, self.position.y, self.position.z))
+        print('volume: {}'.format(self.volume))
+        print('clusterID: {}'.format(self.clusterID))
+        print('neighbourCount: {}'.format(self.neighbourCount))
+        
+        for neighbourIndex in range(0, self.neighbourCount):
+            print('{}, '.format(self.neighbours[neighbourIndex]))
+             
+
+    #Debug/output-related method
+    def printInFile(self,outputFileHandler): 
+        
+        print(self.position.x,\
+              self.position.y,\
+              self.position.z,\
+              self.chemicalType,\
+              self.radius,\
+              self.forwardBurningTime,\
+              self.backwardBurningTime,\
+              self.particleID,\
+              file = outputFileHandler)
+
+                 

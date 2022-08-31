@@ -7,7 +7,7 @@ Purpose
     where the particle positions are provided. To this aim, it implements the 'burning algorithm' 
     described in 
         H J Herrmann et al, J. Phys. A: Math. Gen., 17 L261, 1984
-
+	https://doi.org/10.1088/0305-4470/17/5/008
 
 Algorithm
 ----------
@@ -39,21 +39,3 @@ User-defined parameters
        NODE_START = int : fixed box node 1; defined if fixed box nodes to set extremes of backbone
        NODE_END   = int : fxied box node 2; defined if fixed box nodes to set extremes of backbon
  	
-
-Output/debug returns 
---------------------
-     1.The code returns 4 figures, describing the time evolution of the elastic backbone	 
-
-     2.The algorithm produces as output several .xyz, one for each frame, that can be directly used as input 
-       files inside the Ovito visualization software.Each line represents a particle. 
-       Output file structure:
-	   Number of particles
-	   [Empty line]
-	   positionX	positionY	positionZ	chemicalType	radius	forwardBurningTime	backwardBurningTime	particleID
-	   positionX	positionY	positionZ	chemicalType	radius	forwardBurningTime	backwardBurningTime	particleID
-	   ....            ....
-
-     3.The algorithm also produces a summary.dat file. Each line corresponts to a frame and has the following 
-       structure,  where 'minPath' indicates here the shortest path moving between connected particles:
-	   timeIndex	time	#particlesInMinPathP1P2	minPathLengthP1P2	#particlesInAllSMinPathsP1P2	linearDistanceP1P2	#particlesInLargestCluster 
-      	  

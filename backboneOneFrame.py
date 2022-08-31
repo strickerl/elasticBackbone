@@ -10,8 +10,8 @@ Created on Mon May  6 14:20:01 2022
 """
 import numpy as np
 from importlib import reload
-from burning_algorithm import forwardBurning
-from burning_algorithm import backwardBurning
+from burningAlgorithm import forwardBurning
+from burningAlgorithm import backwardBurning
 
 
 import Backbone
@@ -30,15 +30,24 @@ import Point
 reload(Point)
 from Point import Point
 
+import DataManager
+reload(DataManager)
+from DataManager import DataManager
+    
+from myEnum import enum
+CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
+    
+ 
+
 
 def findClosestParticleToPoint(particles,pointP):
-    '''Function that finds the minimum distance between pointP (xP,yP,zP) and 
-        all particles contained in a list'''  
+    '''Function that finds the minimum distance between pointP and all
+       particles contained in a list'''  
            
-    particleDistancesToPoint = np.asarray([p.distanceToPoint(pointP) for p in particles])
+    particleDistancesToPoint = np.asarray([p.distanceTo(pointP) for p in particles])
         
     # Get the index (not the ID) of particle with smallest distance to pointP 
-    indexClosestParticleToPoint= np.argmin(particleDistancesToPoint )
+    indexClosestParticleToPoint= np.argmin(particleDistancesToPoint)
     
     closestParticleToPoint = particles[indexClosestParticleToPoint]
     
@@ -52,23 +61,20 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
     Find the particles P1,P2 to use as initial and final point for the 
     burning algorithm
 
-
     Parameters
     ----------
     box : OBJECT(SimulationBox)
     particles : ARRAY of OBJECTS(Particle) = particles of the largest cluster
     parameters: OBJECT(Parameters)    
 
-
     Returns
     -------
     backboneExtremeParticles : array(2,OBJECT(Particle))
     '''
     
-
     box.findNodes()   
 
-    if  parameters.use_constant_box_nodes_for_backbone_extremes:          
+    if  parameters.useConstantBoxNodesForBackboneExtremes():          
         
         #Box can change size but the box node pair reamins constant 
         box.defineFixedNodesToSetBackboneExtremes(parameters)  
@@ -89,11 +95,11 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
             
             for particle2 in closestParticlesToNodes[index1+1:]:  
                 
-                particleDistance = particle1.distanceToParticle(particle2)
+                particleDistance = particle1.distanceTo(particle2)
                 
                 if particleDistance > particleDistanceMax:
                     particleDistanceMax = particleDistance
-                    backboneExtremes    = np.array(particle1,particle2)
+                    backboneExtremes    = np.asarray([particle1,particle2])
 
 
     backbone.extremes = backboneExtremes
@@ -141,16 +147,8 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
          positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
          positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
          ...
-
     '''    
-    import DataManager
-    reload(DataManager)
-    from DataManager import DataManager
-    
-    from my_enum import enum
-    CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
-    
-    
+   
     DM = DataManager()
     DM.loadDataFromFile(fileNamesIO.input)
 
@@ -185,5 +183,4 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     DM.printXYZFile(DM.particles,fileNamesIO.output)
     
     
-
     return backbone

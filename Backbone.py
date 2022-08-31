@@ -35,22 +35,9 @@ class Backbone:
         particle1 = self.extremes[0]
         particle2 = self.extremes[1]
         
-        self.linearDistanceExtremes = particle1.distanceToParticle(particle2)
+        self.linearDistanceExtremes = particle1.distanceTo(particle2)
 
         
-
-    def printFileSummary(self,fileHandler):
-                
-        print("{:6d}".format(self.timeIndex),\
-              "{:.2f}".format(self.time),\
-              "{:6d}".format(self.minPathParticleCount),\
-              "{:.2f}".format(self.minPathLength), \
-              "{:6d}".format(self.totalParticleCount),\
-              "{:.2f}".format(self.linearDistanceExtremes),\
-              "{:6d}".format(self.largestClusterParticleCount),\
-               file = fileHandler)
-
-
 
     def checkForErrors(self):
               
@@ -87,14 +74,27 @@ class Backbone:
         particle = endParticle
     
         while particle != startParticle:
-        #while particle.isBurntByParticleIndex != None:
     
             burnerIndex = particle.isBurntByParticleIndex
             burner      = particles[burnerIndex]
         
-            dLength = burner.distanceToParticle(particle)
+            dLength = burner.distanceTo(particle)
             connectedLength = connectedLength + dLength
     
             particle = burner            
             
         self.minPathLength = connectedLength
+        
+        
+    #Debug/output file    
+    def printFileSummary(self,fileHandler):
+                    
+        print("{:6d}".format(self.timeIndex),\
+              "{:.2f}".format(self.time),\
+              "{:6d}".format(self.minPathParticleCount),\
+              "{:.2f}".format(self.minPathLength), \
+              "{:6d}".format(self.totalParticleCount),\
+              "{:.2f}".format(self.linearDistanceExtremes),\
+              "{:6d}".format(self.largestClusterParticleCount),\
+               file = fileHandler)
+
