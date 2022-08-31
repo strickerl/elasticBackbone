@@ -51,6 +51,8 @@ def defineSummaryOutputFileName(baseFolder):
   
     fileNameSummary        = 'summary.dat'
     summaryOutputFileName  = baseFolder + '/Output/' + fileNameSummary
+    
+    os.makedirs(os.path.dirname(summaryOutputFileName), exist_ok=True)
 
     return summaryOutputFileName
     
