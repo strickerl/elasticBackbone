@@ -35,7 +35,7 @@ class Backbone:
         particle1 = self.extremes[0]
         particle2 = self.extremes[1]
         
-        self.linearDistanceExtremes = particle1.distanceTo(particle2)
+        self.linearDistanceExtremes = particle1.distanceToParticle(particle2)
 
         
 
@@ -78,7 +78,7 @@ class Backbone:
             burnerIndex = particle.isBurntByParticleIndex
             burner      = particles[burnerIndex]
         
-            dLength = burner.distanceTo(particle)
+            dLength = burner.distanceToParticle(particle)
             connectedLength = connectedLength + dLength
     
             particle = burner            

@@ -44,7 +44,7 @@ def findClosestParticleToPoint(particles,pointP):
     '''Function that finds the minimum distance between pointP and all
        particles contained in a list'''  
            
-    particleDistancesToPoint = np.asarray([p.distanceTo(pointP) for p in particles])
+    particleDistancesToPoint = np.asarray([p.distanceToPoint(pointP) for p in particles])
         
     # Get the index (not the ID) of particle with smallest distance to pointP 
     indexClosestParticleToPoint= np.argmin(particleDistancesToPoint)
@@ -95,7 +95,7 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
             
             for particle2 in closestParticlesToNodes[index1+1:]:  
                 
-                particleDistance = particle1.distanceTo(particle2)
+                particleDistance = particle1.distanceToParticle(particle2)
                 
                 if particleDistance > particleDistanceMax:
                     particleDistanceMax = particleDistance

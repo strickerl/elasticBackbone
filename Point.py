@@ -11,8 +11,8 @@ reload(Vector)
 from Vector import Vector
 
 
-class Point:
+class Point(Vector):
 
-    def __init__(self,coordinateX,coordinateY,coordinateZ):
-
-        self.position = Vector(coordinateX, coordinateY, coordinateZ)
+    def _init_(self, coordinateX,coordinateY,coordinateZ):
+    
+        Vector._init_(self, coordinateX, coordinateY, coordinateZ)
