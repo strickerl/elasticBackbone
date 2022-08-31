@@ -52,28 +52,17 @@ class Particle:
 
 
             
-    def distanceToParticle(self, particle): 
-          
-        dx = self.position.x - particle.position.x
-        dy = self.position.y - particle.position.y
-        dz = self.position.z - particle.position.z
+    def distanceTo(self, point): 
+        #point can be a Point or a Particle  
+        
+        dx = self.position.x - point.position.x
+        dy = self.position.y - point.position.y
+        dz = self.position.z - point.position.z
           
         d2 = dx*dx + dy*dy + dz*dz
           
         return d2**0.5      
     
-
-
-    def distanceToPoint(self, point = Point): 
-        
-        dx = self.position.x - point.x
-        dy = self.position.y - point.y
-        dz = self.position.z - point.z
-        
-        d2 = dx*dx + dy*dy + dz*dz
-        
-        return d2**0.5
-
 
 
     def isBurnt(self):

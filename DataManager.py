@@ -60,11 +60,6 @@ class DataManager:
         self.particleCount = len(self.particles)
     
    
-    
-    def findDistancesFromPoint(self, point):
-        
-        self.distances = np.asarray([p.distanceToPoint(point) for index, p in enumerate(self.particles)])        
-        
         
         
     def loadDataFromFile(self, fname):
