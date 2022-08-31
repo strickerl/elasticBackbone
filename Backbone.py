@@ -28,8 +28,8 @@ class Backbone:
         self.linearDistanceExtremes   = float()
         self.allMinPathsParticleCount = int
         self.largestClusterParticleCount = len(particles)
-        self.forwardBurning        = object(BurningRound)
-        self.backwardBurning       = object(BurningRound)
+        self.forwardBurnParticleCount = int
+        self.forwardBurnParticleCount = int
         
 
     def calculateLinearDistanceBetweenExtremes(self):
@@ -54,26 +54,44 @@ class Backbone:
 
 
 
-
     def checkForErrors(self):
-       
-       particleCountForward = self.forwardBurning.particleCount
-       particleCountBackward = self.backwardBurning.particleCount
-       
-       assert particleCountForward == particleCountBackward,\
+              
+       assert self.forwardBurnParticleCount == self.backwardBurnParticleCount,\
            'Min # particles is != in forward and backward burning\n' \
             f'time={self.time}\n'\
-            f'forward burning particle # ={particleCountForward}, \n'\
-            f'backward burning particle # = {particleCountBackward}'
+            f'forward burning particle # ={self.forwardBurnParticleCount}, \n'\
+            f'backward burning particle # = {self.backwardBurnParticleCount}'
+
+       
+           
+
+    def getSummaryForwardBurning(self,particles,startParticle,endParticle):
+
+        endParticleIndex = endParticle.index         
+
+        self.forwardBurnParticleCount = particles[endParticleIndex]
+        self.minPathParticleCount     = self.forwardBurnParticleCount
+        self.minPathLength = self.getMinPathLength(particles,endParticle)
 
 
 
-class BurningRound:
+    def getMinPathLength(self,particles,endParticle):
+        ''' Sum of inteparticle distances along shortest path connecting backbone extremes
+            It is calculated by going backwards, from one particle to its burner
+        '''
+        
+        connectedLength = 0.
+        particle = endParticle
     
-    def __init__(self,particleCount):
-
-        self.particleCount = particleCount
-
+        while particle.isBurntByParticleIndex != None:
+    
+            burnerIndex = particle.isBurntByParticleIndex
+            burner      = particles[burnerIndex]
+        
+            dLength = burner.distanceToParticle(particle)
+            connectedLength = connectedLength + dLength
+    
+            particle = burner            
 
 
 

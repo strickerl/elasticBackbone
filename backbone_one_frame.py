@@ -35,7 +35,7 @@ def find_closest_particle_to_point(particles,pointP):
     '''Function that finds the minimum distance between pointP (xP,yP,zP) and 
         all particles contained in a list'''  
            
-    particleDistancesToPoint = np.asarray([p.get_distance_from_point(pointP) for p in particles])
+    particleDistancesToPoint = np.asarray([p.distanceToPoint(pointP) for p in particles])
         
     # Get the index (not the ID) of particle with smallest distance to pointP 
     indexClosestParticleToPoint= np.argmin(particleDistancesToPoint )
@@ -120,7 +120,6 @@ def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
      backbone = OBJECT(Backbone)
          summary of general info on backbone for one time instant   
     
-    
     Input file
     ----------    
     File with an instantaneous particle configuration, with the data structure:
@@ -153,17 +152,18 @@ def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
     
     
     DM = DataManager()
-    DM.load_data_from_simulation_file(fileNamesIO.input)
+    DM.loadDataFromFile(fileNamesIO.input)
     
     
     #Retain only particles belonging to largest cluster
-    DM.filter_particles_by_cluster_ID(CLUSTER_ID.LARGEST_CLUSTER)
+    DM.filterParticlesByClusterID(CLUSTER_ID.LARGEST_CLUSTER)
     
     #Conversion table: particle ID --> index
-    DM.set_particle_index_from_ID_lookup()
+    DM.particleIndexFromIDlookup()
+    DM.setParticleIndexes()
        
     #Shift box so that origin coincides with min(x,y,z) of particles
-    DM.shift_origin_of_axes()
+    DM.shiftOriginOfAxes()
 
     
     # CALCULATE ELASTIC BACKBONE
@@ -174,10 +174,10 @@ def calculate_backbone_one_frame(fileNamesIO,time,timeIndex,parameters):
     
     
     #Find backbone length = min # connected particles and min path between extremes
-    forward_burning(DM.particles,DM.box,backbone)    
+    forward_burning(DM,backbone)    
     
     #Find whole backbone = all equivalent paths between extremes
-    backward_burning(DM.particles,DM.box,backbone)
+    backward_burning(DM,backbone)
     
     backbone.checkForErrors()
 

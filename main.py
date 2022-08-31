@@ -14,10 +14,10 @@ Project name: Local and global structures in 3D binary colloidal glasses
 import os
 from importlib import reload
 
-from define_parameters import define_parameters
-from backbone_one_frame import calculate_backbone_one_frame
-from IO_operations import define_file_names
-from IO_operations import extract_input_file_list
+from define_parameters import defineParameters
+from backbone_one_frame import calculateBackboneOneFrame
+from IO_operations import defineFileNames
+from IO_operations import extractInputFileList
 
 import Backbone
 reload(Backbone)
@@ -25,16 +25,16 @@ from Backbone import BackboneTimeEvolution
 
 
 
-parameters = define_parameters()
+parameters = defineParameters()
                                   
 #Import data from .dat file inside the folder \Input
-[inputFileList,fileCount,path] = extract_input_file_list()
+[inputFileList,fileCount,path] = extractInputFileList()
 
 #Open summary output file
 folder             = os.path.dirname(__file__)  #absolute dir the present script is in
 fileNameSummary    = 'Summary.dat'
 summaryOutputFile  = folder + '/Output/' + fileNameSummary
-fileSummaryOuputHandler = open(summaryOutputFile,'w')
+fileSummaryOuputHandle = open(summaryOutputFile,'w')
 
 #Create instance of class
 backboneAllTimes = BackboneTimeEvolution(fileCount)
@@ -46,15 +46,15 @@ for fileName in inputFileList:
     timeIndex = timeIndex + 1
     time      = int("".join(filter(str.isdigit, fileName)))  #Extract time from file name
     
-    filesIO = define_file_names(folder,path,fileName)        #For input/output
+    filesIO = defineFileNames(folder,path,fileName)        #For input/output
     print(filesIO.raw)       
     
-    backboneOneFrame = calculate_backbone_one_frame(path,filesIO,time,timeIndex,parameters) 
+    backboneOneFrame = calculateBackboneOneFrame(path,filesIO,time,timeIndex,parameters) 
      
-    backboneOneFrame.printFile(fileSummaryOuputHandler)   
+    backboneOneFrame.printFile(fileSummaryOuputHandle)   
     
     backboneAllTimes.values[timeIndex] = backboneOneFrame  
 
      
-fileSummaryOuputHandler.close()                        
+fileSummaryOuputHandle.close()                        
 backboneAllTimes.printOnScreen()

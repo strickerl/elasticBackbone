@@ -31,20 +31,37 @@ class DataManager:
     def __init__(self):
  
         particle_count = 0
-        self.numberOfParticles = -1
+        self.particleCount = int
         self.particles = np.ndarray((particle_count,), dtype=object)
         self.box = object 
-        self.particle_index_from_ID_lookup = int
+        self.getParticleIndexFromID = -np.ones(particle_count)
         
         
         
-    def load_data_from_simulation_file(self, fname):
+    def filterParticlesByClusterID(self, clusterID):
+
+        myFilter = lambda p: p.clusterID == clusterID
+        
+        matches = np.asarray([myFilter(particle) for particle in self.particles])
+        indices = np.where(matches == True)[0]
+        self.particles = self.particles[indices]
+        self.particleCount = len(self.particles)
+    
+   
+    
+    def findDistancesFromPoint(self, point):
+        
+        self.distances = np.asarray([p.distanceToPoint(point) for index, p in enumerate(self.particles)])        
+        
+        
+        
+    def loadDataFromFile(self, fname):
         
         try:
             file_handle = open(fname, 'r')
         
-            self.read_header_from_simulation_file(file_handle)
-            self.load_particle_data_by_row(file_handle)
+            self.readHeaderFromSimulationFile(file_handle)
+            self.loadParticleDataByRow(file_handle)
         
             file_handle.close()
         
@@ -53,65 +70,72 @@ class DataManager:
         else:
             print('Successfully loaded {}'.format(fname))
         
+        
                 
-        
-        
-    def read_header_from_simulation_file(self, file_handle):
-        
-        line = file_handle.readline()
-        header_fields = line.split()
-        
-        particleCount = header_fields[HEADER_FIELDS.PARTICLE_COUNT]
-        lengthX = header_fields[HEADER_FIELDS.BOX_SIZE_X]
-        lengthY = header_fields[HEADER_FIELDS.BOX_SIZE_Y]
-        lengthZ = header_fields[HEADER_FIELDS.BOX_SIZE_Z]
-        
-        self.particleCount = int(particleCount)
-        self.box = SimulationBox(float(lengthX),float(lengthY),float(lengthZ))
-        self.particles = np.resize(self.particles, self.numberOfParticles)
+    def loadParticleDataByRow(self, fileHandle):
+           
+           # skip header row
+           fileHandle.seek(0)
+           fileHandle.readline()
+           
+           for index in range(0, self.particleCount):
+               
+               line = fileHandle.readline()
+               particleData = line.split()
+               
+               self.particles[index] = Particle(particleData)
+          
         
     
-    
-    def load_particle_data_by_row(self, file_handle):
-        
-        # skip header row
-        file_handle.seek(0)
-        file_handle.readline()
-        
-        for index in range(0, self.particleCount):
-            
-            line = file_handle.readline()
-            particle_data = line.split()
-            
-            self.particles[index] = Particle(particle_data)
-    
-    
-    
-    def filter_particles_by_cluster_ID(self, clusterID):
-
-        my_filter = lambda p: p.clusterID == clusterID
-        
-        matches = np.asarray([my_filter(particle) for particle in self.particles])
-        indices = np.where(matches == True)[0]
-        self.particles = self.particles[indices]
-        self.numberOfParticles = len(self.particles)
-    
-   
-    
-    def set_particle_index_from_ID_lookup(self):
+    def particleIndexFromIDlookup(self):
            
          particleIDmax  = np.max([p.particleID for p in self.particles])
          
-         self.particleIDToIndexLookup = -np.ones(particleIDmax)  
+         self.particleIndexFromIDLookup = -np.ones(particleIDmax)  
          
          #The line ID of the lookup array contains the value of the corresponding particle index    
          for particleIndex in range(0,self.particleCount):
               particleID = self.particles[particleIndex].particleID
-              self.particleIDToIndexLookup[particleID] = particleIndex      
+              self.particleIndexFromIDLookup[particleID] = particleIndex      
+
+
+
+    def printXYZFile(self, particles, outputFileName):
+
+        outputFileHandle = open(outputFileName,'w')             
+
+        print(particles.particleCount,file = outputFileHandle) #Particle number
+        print(file = outputFileHandle)                         #Empty line
+        for particle in particles:
+           particle.printOnFile(outputFileHandle)
+           
+        outputFileHandle.close()
+        
+              
+
+    def readHeaderFromSimulationFile(self, fileHandle):
+        
+        line = fileHandle.readline()
+        headerFields = line.split()
+        
+        particleCount = headerFields[HEADER_FIELDS.PARTICLE_COUNT]
+        lengthX = headerFields[HEADER_FIELDS.BOX_SIZE_X]
+        lengthY = headerFields[HEADER_FIELDS.BOX_SIZE_Y]
+        lengthZ = headerFields[HEADER_FIELDS.BOX_SIZE_Z]
+        
+        self.particleCount = int(particleCount)
+        self.box = SimulationBox(float(lengthX),float(lengthY),float(lengthZ))
+        self.particles = np.resize(self.particles, self.particleCount)
               
     
     
-    def shift_origin_of_axes(self):
+    def setParticleIndexes(self):
+            
+        for particleIndex, particle in enumerate(self.particles):
+            particle.setParticleIndex(particleIndex)
+    
+    
+    def shiftOriginOfAxes(self):
         '''
             Shift all particle coordinates (x,y,z) so that the new origin of axes 
             coincides with min(x),min(y),min(z)
@@ -127,22 +151,4 @@ class DataManager:
             particle.y = particle.y - yMin
             particle.z = particle.z - zMin
 
-    
-    
-    def find_distances_from_point(self, point):
-        
-        self.distances = np.asarray([p.get_distance_from_point(point) for index, p in enumerate(self.particles)])
-
-
-
-    def printXYZFile(self, particles, outputFileName):
-
-        outputFileHandler = open(outputFileName,'w')             
-
-        print(particles.particleCount,file = outputFileHandler) #Particle number
-        print(file = outputFileHandler)                         #Empty line
-        for particle in particles:
-           particle.printOnFile(outputFileHandler)
-
-        outputFileHandler.close()
 
