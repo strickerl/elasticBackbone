@@ -5,7 +5,7 @@ Created on Tue Aug 30 14:05:44 2022
 @author: Laura Stricker
 """
 
-from my_enum import enum
+from myEnum import enum
 CLOSEST_BOX_NODES = enum(RECACULATE_EACH_FRAME = 0, CONSTANT_FOR_ALL_TIMES = 1)
 
 

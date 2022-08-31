@@ -4,7 +4,7 @@
 Created on Sat Aug 27 03:44:56 2022
 @author: Laura Stricker, laura.stricker@mat.ethz.ch
 """
-from my_enum import enum
+from myEnum import enum
 from importlib import reload
 
 import Parameters
@@ -38,7 +38,6 @@ def defineParameters():
                      
     
     #If user chooses fixed box nodes, they have to choose which ones
-
     if  BACKBONE_EXTREMES_FLAG == CLOSEST_BOX_NODES.CONSTANT_FOR_ALL_TIMES :
         
         #     Front:         Back:

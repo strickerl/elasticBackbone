@@ -8,8 +8,8 @@ Created on Sun Aug 28 18:00:31 2022
 from importlib import reload
 import numpy as np
 
-from my_enum import enum
-from fields import FIELDS, HEADER_FIELDS
+from myEnum import enum
+from columns import COLUMN_NAMES, HEADER_COLUMN_NAMES
 
 import Particle
 reload(Particle)
@@ -120,12 +120,12 @@ class DataManager:
     def readHeaderFromSimulationFile(self, fileHandle):
         
         line = fileHandle.readline()
-        headerFields = line.split()
+        headerColumnNames = line.split()
         
-        particleCount = headerFields[HEADER_FIELDS.PARTICLE_COUNT]
-        lengthX = headerFields[HEADER_FIELDS.BOX_SIZE_X]
-        lengthY = headerFields[HEADER_FIELDS.BOX_SIZE_Y]
-        lengthZ = headerFields[HEADER_FIELDS.BOX_SIZE_Z]
+        particleCount = headerColumnNames[HEADER_COLUMN_NAMES.PARTICLE_COUNT]
+        lengthX = headerColumnNames[HEADER_COLUMN_NAMES.BOX_SIZE_X]
+        lengthY = headerColumnNames[HEADER_COLUMN_NAMES.BOX_SIZE_Y]
+        lengthZ = headerColumnNames[HEADER_COLUMN_NAMES.BOX_SIZE_Z]
         
         self.particleCount = int(particleCount)
         self.box = SimulationBox(float(lengthX),float(lengthY),float(lengthZ))

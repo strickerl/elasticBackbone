@@ -10,8 +10,8 @@ Created on Mon May  6 14:20:01 2022
 """
 import numpy as np
 from importlib import reload
-from burning_algorithm import forwardBurning
-from burning_algorithm import backwardBurning
+from burningAlgorithm import forwardBurning
+from burningAlgorithm import backwardBurning
 
 
 import Backbone
@@ -29,6 +29,15 @@ from Particle import Particle
 import Point
 reload(Point)
 from Point import Point
+
+import DataManager
+reload(DataManager)
+from DataManager import DataManager
+    
+from myEnum import enum
+CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
+    
+ 
 
 
 def findClosestParticleToPoint(particles,pointP):
@@ -141,16 +150,8 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
          positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
          positionX   positionY   positionZ  chemicalType   radius  particleForwardBurningTime particleBackwardBurningTime  particleID
          ...
-
     '''    
-    import DataManager
-    reload(DataManager)
-    from DataManager import DataManager
-    
-    from my_enum import enum
-    CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
-    
-    
+   
     DM = DataManager()
     DM.loadDataFromFile(fileNamesIO.input)
 
@@ -185,5 +186,4 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     DM.printXYZFile(DM.particles,fileNamesIO.output)
     
     
-
     return backbone
