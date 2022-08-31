@@ -34,7 +34,7 @@ class DataManager:
         self.particleCount = int
         self.particles = np.ndarray((particle_count,), dtype=object)
         self.box = object 
-        self.getParticleIndexFromID = -np.ones(particle_count)
+        self.particleIndexFromIDlookup = -np.ones(particle_count,dtype=int)
         
         
         
@@ -67,8 +67,8 @@ class DataManager:
         
         except:
             print('Failed to open: {}'.format(fname))
-        else:
-            print('Successfully loaded {}'.format(fname))
+        #else:
+        #    print('Successfully loaded {}'.format(fname))
         
         
                 
@@ -87,16 +87,20 @@ class DataManager:
           
         
     
-    def particleIndexFromIDlookup(self):
+    def buildParticleIndexFromIDlookup(self):
            
          particleIDmax  = np.max([p.particleID for p in self.particles])
          
-         self.particleIndexFromIDLookup = -np.ones(particleIDmax)  
+         self.particleIndexFromIDlookup = -np.ones(particleIDmax + 1, dtype=int)  
          
          #The line ID of the lookup array contains the value of the corresponding particle index    
          for particleIndex in range(0,self.particleCount):
               particleID = self.particles[particleIndex].particleID
-              self.particleIndexFromIDLookup[particleID] = particleIndex      
+              self.particleIndexFromIDlookup[particleID] = particleIndex     
+              
+
+    def getParticleIndexFromID(self,particleID):
+        return self.particleIndexFromIDlookup[particleID]
 
 
 
@@ -104,7 +108,7 @@ class DataManager:
 
         outputFileHandle = open(outputFileName,'w')             
 
-        print(particles.particleCount,file = outputFileHandle) #Particle number
+        print(self.particleCount,file = outputFileHandle) #Particle number
         print(file = outputFileHandle)                         #Empty line
         for particle in particles:
            particle.printOnFile(outputFileHandle)
@@ -141,14 +145,14 @@ class DataManager:
             coincides with min(x),min(y),min(z)
         ''' 
         #New origin of axes based on particles' positions
-        xMin = np.min([particle.x for particle in self.particles])
-        yMin = np.min([particle.y for particle in self.particles])
-        zMin = np.min([particle.z for particle in self.particles])
+        xMin = np.min([particle.position.x for particle in self.particles])
+        yMin = np.min([particle.position.y for particle in self.particles])
+        zMin = np.min([particle.position.z for particle in self.particles])
                
         #Shift particle coordinates
         for particle in self.particles:
-            particle.x = particle.x - xMin
-            particle.y = particle.y - yMin
-            particle.z = particle.z - zMin
+            particle.position.x = particle.position.x - xMin
+            particle.position.y = particle.position.y - yMin
+            particle.position.z = particle.position.z - zMin
 
 

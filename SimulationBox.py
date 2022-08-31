@@ -29,21 +29,19 @@ class SimulationBox:
     def findNodes(self):
         
         node0 = Point(0.,0.,0.)
-        node1 = Point(self.lx,0.,0.)
-        node2 = Point(0.,self.ly,0.)
-        node3 = Point(0.,0.,self.lz)
-        node4 = Point(self.lx,self.ly,0.)
-        node5 = Point(self.lx,0.,self.lz)
-        node6 = Point(0.,self.ly,self.lz)
-        node7 = Point(self.lx,self.ly,self.lz)
+        node1 = Point(self.lengthX,0.,0.)
+        node2 = Point(0.,self.lengthY,0.)
+        node3 = Point(0.,0.,self.lengthZ)
+        node4 = Point(self.lengthX,self.lengthY,0.)
+        node5 = Point(self.lengthX,0.,self.lengthZ)
+        node6 = Point(0.,self.lengthY,self.lengthZ)
+        node7 = Point(self.lengthX,self.lengthY,self.lengthZ)
         
         self.nodes = (node0,node1,node2,node3,node4,node5,node6,node7)
         
         
         
     def defineFixedNodesToSetBackboneExtremes(self,parameters):
-             
-        nodeStart = parameters.boxNodeStart
-        nodeEnd   = parameters.boxNodeEnd
-        
-        self.fixedNodePair = self.nodes(nodeStart,nodeEnd)
+                     
+        self.fixedNodePair[0] = self.nodes[parameters.boxNodeStart]
+        self.fixedNodePair[1] = self.nodes[parameters.boxNodeEnd]

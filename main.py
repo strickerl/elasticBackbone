@@ -16,29 +16,29 @@ from importlib import reload
 
 from define_parameters import defineParameters
 from backbone_one_frame import calculateBackboneOneFrame
-from IO_operations import defineFileNames
+from IO_operations import defineIOFileNames
+from IO_operations import defineSummaryOutputFileName
 from IO_operations import extractInputFileList
 
-import Backbone
-reload(Backbone)
-from Backbone import BackboneTimeEvolution
+import BackboneTimeEvolution
+reload(BackboneTimeEvolution)
+from BackboneTimeEvolution import BackboneTimeEvolution
 
 
 
 parameters = defineParameters()
                                   
 #Import data from .dat file inside the folder \Input
-[inputFileList,fileCount,path] = extractInputFileList()
+baseFolder                     = os.path.dirname(__file__)  #absolute dir the present script is in
+[inputFileList,inputFileCount] = extractInputFileList(baseFolder)
 
-#Open summary output file
-folder             = os.path.dirname(__file__)  #absolute dir the present script is in
-fileNameSummary    = 'Summary.dat'
-summaryOutputFile  = folder + '/Output/' + fileNameSummary
-fileSummaryOuputHandle = open(summaryOutputFile,'w')
+
+summaryOutputFileName  = defineSummaryOutputFileName(baseFolder)
+fileSummaryOuputHandle = open(summaryOutputFileName,'w')
+
 
 #Create instance of class
-backboneAllTimes = BackboneTimeEvolution(fileCount)
-
+backboneAllTimes = BackboneTimeEvolution(inputFileCount)
 
 #Loop over time instants
 timeIndex = -1
@@ -46,12 +46,12 @@ for fileName in inputFileList:
     timeIndex = timeIndex + 1
     time      = int("".join(filter(str.isdigit, fileName)))  #Extract time from file name
     
-    filesIO = defineFileNames(folder,path,fileName)        #For input/output
-    print(filesIO.raw)       
+    fileNamesIO = defineIOFileNames(baseFolder,fileName)     #For input/output
+    print(fileNamesIO.raw)       
     
-    backboneOneFrame = calculateBackboneOneFrame(path,filesIO,time,timeIndex,parameters) 
+    backboneOneFrame = calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters) 
      
-    backboneOneFrame.printFile(fileSummaryOuputHandle)   
+    backboneOneFrame.printFileSummary(fileSummaryOuputHandle)   
     
     backboneAllTimes.values[timeIndex] = backboneOneFrame  
 

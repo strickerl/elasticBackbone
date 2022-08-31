@@ -71,7 +71,7 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
     if  parameters.use_constant_box_nodes_for_backbone_extremes:          
         
         #Box can change size but the box node pair reamins constant 
-        box.defineFixedNodesToSetBackboneExtremes(box,parameters)  
+        box.defineFixedNodesToSetBackboneExtremes(parameters)  
         fixedBoxNodes = box.fixedNodePair             
 
         #Find the closest particles to the two fixed box vertices
@@ -159,7 +159,7 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     DM.filterParticlesByClusterID(CLUSTER_ID.LARGEST_CLUSTER)
     
     #Conversion table: particle ID --> index
-    DM.particleIndexFromIDlookup()
+    DM.buildParticleIndexFromIDlookup()
     DM.setParticleIndexes()
        
     #Shift box so that origin coincides with min(x,y,z) of particles
@@ -168,10 +168,9 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     
     # CALCULATE ELASTIC BACKBONE
     #---------------------------
-    backbone = Backbone(timeIndex,time)
+    backbone = Backbone(timeIndex,time,DM.particles)
     
     findBurningAlgorithmExtremes(DM.box,DM.particles,parameters,backbone)
-    
     
     #Find backbone length = min # connected particles and min path between extremes
     forwardBurning(DM,backbone)    

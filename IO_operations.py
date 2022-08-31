@@ -19,24 +19,24 @@ reload(SimulationBox)
 from SimulationBox import SimulationBox
 
 
-def natural_sort(l): 
+def naturalSort(myList): 
     '''Sort alphanumeric list'''
 
-    convert = lambda text: int(text) if text.isdigit() else text.lower()
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
-    return sorted(l, key=alphanum_key)
+    convert         = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanumericKey = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(myList, key = alphanumericKey)
 
 
 
-def define_file_names(folder,path,fileName):
+def defineIOFileNames(baseFolder,fileName):
     '''Define name of input and output files, given the path'''    
 
 
     #Extract raw name, without .dat extension
     rawFileName = fileName[0:len(fileName)-4]
 
-    inputFileName  = path   + fileName    
-    outputFileName = folder + '/Output/' + rawFileName + '.xyz'
+    inputFileName  = baseFolder + '/Input/'  + fileName    
+    outputFileName = baseFolder + '/Output/' + rawFileName + '.xyz'
         
     
     #Create class with name of files
@@ -47,27 +47,33 @@ def define_file_names(folder,path,fileName):
 
 
 
-def extract_input_file_list():
+def defineSummaryOutputFileName(baseFolder):
+  
+    fileNameSummary        = 'Summary.dat'
+    summaryOutputFileName  = baseFolder + '/Output/' + fileNameSummary
+
+    return summaryOutputFileName
+    
+
+
+def extractInputFileList(baseFolder):
     '''
        Define list of input files with particle data, contained inside folder
        .\input
     '''   
 
-    folder        = os.path.dirname(__file__)  #absolute dir the present script is in
-    path          = folder + r'/Input/'
-
+    path          = baseFolder + r'/Input/'
 
     #List of files inside 'path'
     files = os.listdir(path)
 
     #Open files with the string ('keyword') in the name
-    keyword     = "cluster_atoms"
-    list_files_atoms = [name_file for name_file in files if keyword in name_file]
-    nfiles      = len(list_files_atoms)
-    list_files_atoms = natural_sort(list_files_atoms)      
+    keyword           = "cluster_atoms"
+    particleFileList  = [fileName for fileName in files if keyword in fileName]
+    particleFileList  = naturalSort(particleFileList)      
+    fileCount         = len(particleFileList)
 
-
-    return list_files_atoms,nfiles,path
+    return particleFileList, fileCount
 
 
 

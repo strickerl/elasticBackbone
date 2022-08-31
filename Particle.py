@@ -39,14 +39,14 @@ class Particle:
         self.volume = float(particle_data_string[FIELDS.VOLUME])
         self.clusterID = int(particle_data_string[FIELDS.CLUSTER_ID])
         self.neighbourCount = int(particle_data_string[FIELDS.NEIGHBOUR_COUNT])
-        self.neighboursIds = np.ndarray((self.neighbourCount,), dtype=int)
+        self.neighbourIDs = np.ndarray((self.neighbourCount,), dtype=int)
         
         for neighbourIndex in range(0, self.neighbourCount):
-            self.neighboursIds[neighbourIndex] = int(particle_data_string[FIELDS.FIRST_NEIGHBOUR + neighbourIndex])
+            self.neighbourIDs[neighbourIndex] = int(particle_data_string[FIELDS.FIRST_NEIGHBOUR + neighbourIndex])
 
         self.index = int
-        self.forwardBurningTime  = int
-        self.backwardBurningTime = int
+        self.forwardBurningTime  = 0
+        self.backwardBurningTime = 0
         self.isBurntByParticleIndex = None
 
     

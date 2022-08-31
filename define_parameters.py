@@ -12,7 +12,7 @@ reload(Parameters)
 from Parameters import Parameters
 
 
-def define_parameters():
+def defineParameters():
     """
     Input
     -----    
