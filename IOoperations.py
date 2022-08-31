@@ -49,7 +49,7 @@ def defineIOFileNames(baseFolder,fileName):
 
 def defineSummaryOutputFileName(baseFolder):
   
-    fileNameSummary        = 'Summary.dat'
+    fileNameSummary        = 'summary.dat'
     summaryOutputFileName  = baseFolder + '/Output/' + fileNameSummary
 
     return summaryOutputFileName
@@ -74,40 +74,3 @@ def extractInputFileList(baseFolder):
     fileCount         = len(particleFileList)
 
     return particleFileList, fileCount
-
-
-
-
-def Plot_results(time,MinN_P1P2,N_ElBackbone,Ntot,MinPath_P1P2,dist_P1P2):
-    '''Plot figures'''
-      
-    
-    ax = plt.figure(1)
-    line1, = plt.plot(time,MinN_P1P2,'r')
-    line2, = plt.plot(time,N_ElBackbone,'b')
-    plt.xlabel('time')
-    plt.ylabel('Min path (P1P2)')
-    plt.show()
-    line1.set_label('N particles min P1P2')
-    line2.set_label('N particles elastic backbone')
-    ax.legend()
-
-    plt.figure(2)
-    plt.plot(time,np.array(MinN_P1P2)/np.array(Ntot))
-    plt.xlabel('time')
-    plt.ylabel('Min N between P1P2/ Ntot')
-    plt.show()
-
-    plt.figure(3)
-    plt.plot(time,MinPath_P1P2)
-    plt.xlabel('time')
-    plt.ylabel('Min path (P1P2) [Length]')
-    plt.show()
-
-    plt.figure(4)
-    plt.plot(time,np.array(MinPath_P1P2)/np.array(dist_P1P2))
-    plt.xlabel('time')
-    plt.ylabel('Min path / dist (P1P2) ')
-    plt.show()
-
-    return

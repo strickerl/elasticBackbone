@@ -41,8 +41,8 @@ CLUSTER_ID   = enum(LARGEST_CLUSTER = 1)
 
 
 def findClosestParticleToPoint(particles,pointP):
-    '''Function that finds the minimum distance between pointP (xP,yP,zP) and 
-        all particles contained in a list'''  
+    '''Function that finds the minimum distance between pointP and all
+       particles contained in a list'''  
            
     particleDistancesToPoint = np.asarray([p.distanceToPoint(pointP) for p in particles])
         
@@ -61,23 +61,20 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
     Find the particles P1,P2 to use as initial and final point for the 
     burning algorithm
 
-
     Parameters
     ----------
     box : OBJECT(SimulationBox)
     particles : ARRAY of OBJECTS(Particle) = particles of the largest cluster
     parameters: OBJECT(Parameters)    
 
-
     Returns
     -------
     backboneExtremeParticles : array(2,OBJECT(Particle))
     '''
     
-
     box.findNodes()   
 
-    if  parameters.use_constant_box_nodes_for_backbone_extremes:          
+    if  parameters.useConstantBoxNodesForBackboneExtremes():          
         
         #Box can change size but the box node pair reamins constant 
         box.defineFixedNodesToSetBackboneExtremes(parameters)  
@@ -102,7 +99,7 @@ def findBurningAlgorithmExtremes(box,particles,parameters,backbone):
                 
                 if particleDistance > particleDistanceMax:
                     particleDistanceMax = particleDistance
-                    backboneExtremes    = np.array(particle1,particle2)
+                    backboneExtremes    = np.asarray([particle1,particle2])
 
 
     backbone.extremes = backboneExtremes

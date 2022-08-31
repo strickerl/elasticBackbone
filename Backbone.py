@@ -39,19 +39,6 @@ class Backbone:
 
         
 
-    def printFileSummary(self,fileHandler):
-                
-        print("{:6d}".format(self.timeIndex),\
-              "{:.2f}".format(self.time),\
-              "{:6d}".format(self.minPathParticleCount),\
-              "{:.2f}".format(self.minPathLength), \
-              "{:6d}".format(self.totalParticleCount),\
-              "{:.2f}".format(self.linearDistanceExtremes),\
-              "{:6d}".format(self.largestClusterParticleCount),\
-               file = fileHandler)
-
-
-
     def checkForErrors(self):
               
        assert self.forwardMinParticleCount == self.backwardMinParticleCount,\
@@ -87,7 +74,6 @@ class Backbone:
         particle = endParticle
     
         while particle != startParticle:
-        #while particle.isBurntByParticleIndex != None:
     
             burnerIndex = particle.isBurntByParticleIndex
             burner      = particles[burnerIndex]
@@ -98,3 +84,17 @@ class Backbone:
             particle = burner            
             
         self.minPathLength = connectedLength
+        
+        
+    #Debug/output file    
+    def printFileSummary(self,fileHandler):
+                    
+        print("{:6d}".format(self.timeIndex),\
+              "{:.2f}".format(self.time),\
+              "{:6d}".format(self.minPathParticleCount),\
+              "{:.2f}".format(self.minPathLength), \
+              "{:6d}".format(self.totalParticleCount),\
+              "{:.2f}".format(self.linearDistanceExtremes),\
+              "{:6d}".format(self.largestClusterParticleCount),\
+               file = fileHandler)
+

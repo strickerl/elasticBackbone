@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Aug 28 18:00:31 2022
+@author: Laura Stricker laura.stricker@mat.ethz.ch
 
-@author: Laura Stricker
+    Operations on the whole particle configuration for a time instant (frame)
 """
 
 from importlib import reload
@@ -25,7 +26,6 @@ from SimulationBox import SimulationBox
 
 
 
-
 class DataManager:
 
     def __init__(self):
@@ -36,6 +36,18 @@ class DataManager:
         self.box = object 
         self.particleIndexFromIDlookup = -np.ones(particle_count,dtype=int)
         
+        
+    def buildParticleIndexFromIDlookup(self):
+           
+         particleIDmax  = np.max([p.particleID for p in self.particles])
+         
+         self.particleIndexFromIDlookup = -np.ones(particleIDmax + 1, dtype=int)  
+         
+         #The line ID of the lookup array contains the value of the corresponding particle index    
+         for particleIndex in range(0,self.particleCount):
+              particleID = self.particles[particleIndex].particleID
+              self.particleIndexFromIDlookup[particleID] = particleIndex     
+                    
         
         
     def filterParticlesByClusterID(self, clusterID):
@@ -87,34 +99,10 @@ class DataManager:
           
         
     
-    def buildParticleIndexFromIDlookup(self):
-           
-         particleIDmax  = np.max([p.particleID for p in self.particles])
-         
-         self.particleIndexFromIDlookup = -np.ones(particleIDmax + 1, dtype=int)  
-         
-         #The line ID of the lookup array contains the value of the corresponding particle index    
-         for particleIndex in range(0,self.particleCount):
-              particleID = self.particles[particleIndex].particleID
-              self.particleIndexFromIDlookup[particleID] = particleIndex     
-              
-
     def getParticleIndexFromID(self,particleID):
         return self.particleIndexFromIDlookup[particleID]
 
-
-
-    def printXYZFile(self, particles, outputFileName):
-
-        outputFileHandle = open(outputFileName,'w')             
-
-        print(self.particleCount,file = outputFileHandle) #Particle number
-        print(file = outputFileHandle)                         #Empty line
-        for particle in particles:
-           particle.printOnFile(outputFileHandle)
-           
-        outputFileHandle.close()
-        
+     
               
 
     def readHeaderFromSimulationFile(self, fileHandle):
@@ -162,5 +150,17 @@ class DataManager:
             particle.position.x = particle.position.x - xMin
             particle.position.y = particle.position.y - yMin
             particle.position.z = particle.position.z - zMin
+            
+            
+    #Debug/output files        
+    def printXYZFile(self, particles, outputFileName):
 
+        outputFileHandle = open(outputFileName,'w')             
 
+        print(self.particleCount,file = outputFileHandle) #Particle number
+        print(file = outputFileHandle)                         #Empty line
+        for particle in particles:
+           particle.printInFile(outputFileHandle)
+           
+        outputFileHandle.close()
+   

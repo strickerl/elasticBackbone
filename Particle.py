@@ -112,7 +112,7 @@ class Particle:
         self.radius = parameters.radiusMin if self.chemicalType==1 else parameters.radiusMax
         
         
-    #Debug-related method        
+    #Debug/output-related method        
     def display(self):
         
         print('ID: {}'.format(self.particleID))
@@ -127,7 +127,7 @@ class Particle:
              
 
     #Debug/output-related method
-    def printOnFile(self,outputFileHandler): 
+    def printInFile(self,outputFileHandler): 
         
         print(self.position.x,\
               self.position.y,\

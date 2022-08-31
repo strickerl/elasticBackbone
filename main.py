@@ -8,7 +8,7 @@ Project name: Local and global structures in 3D binary colloidal glasses
     This code calculates the elastic backbone of a series of particles 
     configurations by implementing the burning algorithm described in
           H J Herrmann et al, J. Phys. A: Math. Gen., 17 L261, 1984
-            
+          https://doi.org/10.1088/0305-4470/17/5/008  
 """
 
 import os
@@ -20,9 +20,9 @@ from IOoperations import defineIOFileNames
 from IOoperations import defineSummaryOutputFileName
 from IOoperations import extractInputFileList
 
-import BackboneTimeEvolution
-reload(BackboneTimeEvolution)
-from BackboneTimeEvolution import BackboneTimeEvolution
+import BackboneAllTimesResults
+reload(BackboneAllTimesResults)
+from BackboneAllTimesResults import BackboneAllTimesResults
 
 
 
@@ -36,7 +36,7 @@ baseFolder                     = os.path.dirname(__file__)  #absolute dir the pr
 summaryOutputFileName  = defineSummaryOutputFileName(baseFolder)
 fileSummaryOuputHandle = open(summaryOutputFileName,'w')
 
-backboneAllTimes = BackboneTimeEvolution(inputFileCount)
+backboneAllTimes = BackboneAllTimesResults(inputFileCount)
 
 
 for frameTimeIndex, fileNameOneFrame in enumerate(inputFileList):     
