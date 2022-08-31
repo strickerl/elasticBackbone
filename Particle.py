@@ -35,7 +35,7 @@ class Particle:
         y = float(particle_data_string[FIELDS.Y])
         z = float(particle_data_string[FIELDS.Z])
         self.position = Vector(x, y, z)
-        self.radius = float()
+        self.radius = float
         self.volume = float(particle_data_string[FIELDS.VOLUME])
         self.clusterID = int(particle_data_string[FIELDS.CLUSTER_ID])
         self.neighbourCount = int(particle_data_string[FIELDS.NEIGHBOUR_COUNT])
@@ -49,7 +49,6 @@ class Particle:
         self.backwardBurningTime = 0
         self.isBurntByParticleIndex = None
 
-    
     
     
     def display(self):
@@ -133,3 +132,8 @@ class Particle:
     def setParticleIndex(self,particleIndex):
         
         self.index = particleIndex
+        
+        
+    def setParticleRadius(self,parameters):
+        
+        self.radius = parameters.radiusMin if self.chemicalType==1 else parameters.radiusMax

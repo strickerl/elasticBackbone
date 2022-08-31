@@ -153,10 +153,11 @@ def calculateBackboneOneFrame(fileNamesIO,time,timeIndex,parameters):
     
     DM = DataManager()
     DM.loadDataFromFile(fileNamesIO.input)
-    
+
     
     #Retain only particles belonging to largest cluster
     DM.filterParticlesByClusterID(CLUSTER_ID.LARGEST_CLUSTER)
+    DM.setParticleRadii(parameters)
     
     #Conversion table: particle ID --> index
     DM.buildParticleIndexFromIDlookup()

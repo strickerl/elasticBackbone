@@ -42,14 +42,16 @@ def defineParameters():
     if  BACKBONE_EXTREMES_FLAG == CLOSEST_BOX_NODES.CONSTANT_FOR_ALL_TIMES :
         
         #     Front:         Back:
-        #    3     2        7     6  
+        #    7     6        3     2  
         #    x_____x        x_____x
         #    |     |        |     |
         #    |     |        |     |
         #    x_____x        x_____x
-        #    0     1        4     5
+        #    4     5        0     1
+        
         NODE_START = 0
         NODE_END   = 6
+        
     else:
         NODE_START = None
         NODE_END   = None        

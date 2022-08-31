@@ -139,6 +139,14 @@ class DataManager:
             particle.setParticleIndex(particleIndex)
     
     
+    
+    def setParticleRadii(self,parameters):
+        
+        for particle in self.particles:
+            particle.setParticleRadius(parameters)
+
+    
+    
     def shiftOriginOfAxes(self):
         '''
             Shift all particle coordinates (x,y,z) so that the new origin of axes 

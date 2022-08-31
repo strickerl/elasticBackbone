@@ -33,6 +33,7 @@ def forwardBurning(DM,backbone):
     burntParticles = [firstBurntParticle]
     firstBurntParticle.isBurntByParticleIndex = -1   
     firstBurntParticle.forwardBurningTime = burningTimeIndex    
+
     
     while burntParticles: #Exit condition: when nothing was found to burn
     
@@ -58,7 +59,7 @@ def forwardBurning(DM,backbone):
                         neighbour.forwardBurningTime     = burningTimeIndex
                         neighbour.isBurntByParticleIndex = particle.index
                         burntParticles.append(neighbour) 
-                    
+                        
                     
     backbone.getSummaryForwardBurning(DM.particles,firstBurntParticle,lastBurntParticle)                
    
@@ -115,12 +116,12 @@ def backwardBurning(DM,backbone):
                 if neighbour.isConnectedThroughBox(particle, DM.box):                   
                     #if neighbour has not been burnt yet
                     if (not neighbour.isBurnt()) and\
-                       (neighbour.forwardBurningTime < particle.forwardBurningTime):                   
+                        (neighbour.forwardBurningTime < particle.forwardBurningTime):                   
                         #if neighbour was burnt before particle in forward burning    
                         neighbour.backwardBurningTime  = burningTimeIndex
                         neighbour.isBurntByParticleIndex = particle.index
                         burntParticles.append(neighbour) 
                         burntParticleCountTot += 1  # Number of all burnt particles
-                    
+                        
                     
     backbone.getSummaryBackwardBurning(lastBurntParticle,burntParticleCountTot)                

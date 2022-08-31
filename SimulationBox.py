@@ -30,12 +30,22 @@ class SimulationBox:
         
         node0 = Point(0.,0.,0.)
         node1 = Point(self.lengthX,0.,0.)
-        node2 = Point(0.,self.lengthY,0.)
-        node3 = Point(0.,0.,self.lengthZ)
-        node4 = Point(self.lengthX,self.lengthY,0.)
+        node2 = Point(self.lengthX,self.lengthY,0.)
+        node3 = Point(0.,self.lengthY,0.)
+        node4 = Point(0.,0.,self.lengthZ)
         node5 = Point(self.lengthX,0.,self.lengthZ)
-        node6 = Point(0.,self.lengthY,self.lengthZ)
-        node7 = Point(self.lengthX,self.lengthY,self.lengthZ)
+        node6 = Point(self.lengthX,self.lengthY,self.lengthZ)
+        node7 = Point(0.,self.lengthY,self.lengthZ)
+
+        
+        #     Front:         Back:
+        #    7     6        3     2  
+        #    x_____x        x_____x
+        #    |     |        |     |
+        #    |     |        |     |
+        #    x_____x        x_____x
+        #    4     5        0     1
+        
         
         self.nodes = (node0,node1,node2,node3,node4,node5,node6,node7)
         
